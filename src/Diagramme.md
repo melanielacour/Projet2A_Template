@@ -55,17 +55,31 @@ classDiagram
     }
 
     class UserDAO{
-      +add_user(User): None
-      +delete_user(User): None
-      +search_user(id: int): User
-      +update_user(User): None
+      +add_user(id_user): None
+      +delete_user(id_user): None
+      +search_user(id_user): User
+      +update_user(id_user): None
     }
 
     class User_service_{
-      +log_in(User): None
+      +log_in(id_user): None
     }
 
     class Recommandation{
       +id_film : int
       +get_recommandation(id_film): List[Film]
     }
+
+    class User_client{
+      +log_in(): None
+      +add_client(): None
+      +delete_client(): None
+    }
+
+    class Film_controller{
+      +details_film(id_film): None
+    }
+
+
+
+```
