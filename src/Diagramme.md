@@ -23,7 +23,7 @@ classDiagram
 
     }
 
-    class List_films {
+    class ListFilms {
         +create_list(): None
         +add_film(Film):None
         +supp_film(Film): None
@@ -48,7 +48,7 @@ classDiagram
       +search_commented_film(id_film): Film
     }
 
-    class Film_service {
+    class FilmService {
       +search_film(str): Film
       +add_grade(): None
       +add_comment(): None
@@ -61,7 +61,7 @@ classDiagram
       +update_user(id_user): None
     }
 
-    class User_service_{
+    class UserService_{
       +log_in(id_user): None
     }
 
@@ -70,15 +70,21 @@ classDiagram
       +get_recommandation(id_film): List[Film]
     }
 
-    class User_client{
+    class UserClient{
       +log_in(): None
-      +add_client(): None
-      +delete_client(): None
+      +add_client(id_user): None
+      +delete_client(id_user): None
     }
 
-    class Film_controller{
+    class FilmController{
       +details_film(id_film): None
     }
+
+
+User *-- UserService
+Film *-- FilmService
+Film *-- FilmDAO
+User *-- UserDAO
 
 
 
