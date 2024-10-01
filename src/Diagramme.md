@@ -2,13 +2,33 @@
 
 ```mermaid
 classDiagram
+    class Film {
+        +id_film: int
+        +id_tmdb: int
+        +title: string
+        +producer: string
+        +category: string
+        +date: string
+        +average_rate: float
+        +ratings: List[int]
+        +calculation_mean(): float
+        +add_rating(rating: int): None
+    }
+
+    class List_movie {
+        +films: List[Film]
+        +add_film(Film): None
+        +remove_film(Film): None
+        +get_all_films(): List[Film]
+    }
+
     class User {
         +id_user: int
         +pseudo: string
         +password: string
         +seen: List_movie
         +to_watch: List_movie
-        +scout_list: Liste_user
+        +scouts_list: Liste_user
         +add_seen_film(Film): None
         +add_to_see_film(Film): None
         +add_scout(Scout): None
@@ -17,92 +37,62 @@ classDiagram
     class Scout {
         +id_scout: int
         +pseudo_scout: string
-        +film_list: List_movie
-        +rates_comments: Dict(Film, [int, string])
-        +add_recommended_films(): None
-    }
-
-    class List_movie {
-        +create_list(): None
-        +add_film(Film): None
-        +supp_film(Film): None
-        +share_list(List_movie): None
-        +get_film_list(): List[Film]
-    }
-
-    class Film {
-        +id_film: int
-        +id_tmdb: int
-        +title: str
-        +producer: str
-        +category: str
-        +date: Date
-        +average_rate: float
-        +calculation_mean(): float
-    }
-
-    class FilmDAO {
-        +url: string
-        +add_film(Film): None
-        +supp_film(Film): None
-        +search_commented_film(id_film): Film
-    }
-
-    class FilmService {
-        +search_film(str): Film
-        +add_grade(): None
-        +add_comment(): None
-    }
-
-    class UserDAO {
-        +add_user(id_user): None
-        +delete_user(id_user): None
-        +search_user(id_user): User
-        +update_user(id_user): None
-    }
-
-    class UserService {
-        +log_in(id_user): None
-        +get_scouts(user_id): List[Scout]
-        +get_seen_films(user_id): List[Film]
-        +get_to_watch_films(user_id): List[Film]
-        +get_followers(scout_id): List[User]
+        +password: string
+        +recommended_films: List_movie
+        +add_recommended_film(Film): None
     }
 
     class Liste_user {
-        +create_list(): None
-        +add_scout(Scout): None
-        +add_follower(User): None
-        +get_scout_list(): List[Scout]
-        +get_follower_list(): List[User]
+        +users: List[User]
+        +add_user(User): None
+        +remove_user(User): None
+        +get_all_users(): List[User]
+    }
+
+    class FilmDAO {
+        +get_local_film(film_id: int): Film
+        +add_local_film(Film): None
+    }
+
+    class FilmService {
+        +search_film(query: string): Film
+        +add_grade(Film, Grade): None
+        +add_comment(Film, Comment): None
+    }
+
+    class UserDAO {
+        +get_user(user_id: int): User
+        +add_user(User): None
+        +delete_user(user_id: int): None
+        +get_followers_of_scout(scout_id: int): List[User]
+    }
+
+    class UserService {
+        +log_in(user_id: int): None
+        +become_scout(user_id: int): None
+        +get_scouts(user_id: int): List[Scout]
+        +get_seen_films(user_id: int): List[Film]
+        +get_to_watch_films(user_id: int): List[Film]
     }
 
     class Recommandation {
-        +id_film: int
-        +get_recommandation(id_film): List[Film]
-    }
-
-    class UserClient {
-        +log_in(): None
-        +add_client(id_user): None
-        +delete_client(id_user): None
+        +get_recommendation(film_id: int): List[Film]
     }
 
     class FilmController {
-        +details_film(id_film): None
-        +search_tmdb(query): List[Film]
-        +get_film_details(id_film): Film
+        +get_film_details_from_tmdb(film_id: int): None
+        +search_films_in_tmdb(query: string): None
     }
 
-User *-- UserService
-User *-- List_movie
-User o-- Scout
-User *-- Liste_user
-Scout *-- List_movie
-Film *-- FilmService
-Film *-- FilmDAO
-User *-- UserDAO
-FilmController *-- FilmService
-FilmController *-- FilmDAO
-Liste_user *-- User
-Liste_user *-- Scout
+    User <|-- Scout
+    User o-- List_movie
+    User o-- Liste_user
+    List_movie o-- Film
+    FilmService o-- Film
+    FilmDAO o-- Film
+    UserService o-- User
+    UserDAO o-- User
+    Recommandation o-- Film
+    FilmController o-- FilmService
+
+```
