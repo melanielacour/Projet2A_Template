@@ -1,3 +1,6 @@
+# Architecture 
+
+```mermaid
 ---
 title: Architecture of python app with classes
 ---
@@ -47,3 +50,4 @@ graph LR
     Recommandation-.->Film
     FilmService-.->Film
 
+```
