@@ -1,14 +1,11 @@
-# Diagramme de classes des objets métiers
-
-```mermaid
 classDiagram
     class User {
         +id_user: int
         +pseudo: string
         +password: string
-        +seen: List_movie
-        +to_watch: List_movie
-        +scout_list: Liste_user
+        +seen: List[Film]
+        +to_watch: List[Film]
+        +scouts_list: List[Scout]
         +add_seen_film(Film): None
         +add_to_see_film(Film): None
         +add_scout(Scout): None
@@ -17,17 +14,11 @@ classDiagram
     class Scout {
         +id_scout: int
         +pseudo_scout: string
-        +film_list: List_movie
+        +film_list: List[Film]
         +rates_comments: Dict(Film, [int, string])
-        +add_recommended_films(): None
-    }
-
-    class List_movie {
-        +create_list(): None
-        +add_film(Film): None
-        +supp_film(Film): None
-        +share_list(List_movie): None
-        +get_film_list(): List[Film]
+        +add_recommended_films(Film): None
+        +delete_recommended_films(Film): None
+        +get_followers(): List[User]
     }
 
     class Film {
@@ -66,15 +57,6 @@ classDiagram
         +get_scouts(user_id): List[Scout]
         +get_seen_films(user_id): List[Film]
         +get_to_watch_films(user_id): List[Film]
-        +get_followers(scout_id): List[User]
-    }
-
-    class Liste_user {
-        +create_list(): None
-        +add_scout(Scout): None
-        +add_follower(User): None
-        +get_scout_list(): List[Scout]
-        +get_follower_list(): List[User]
     }
 
     class Recommandation {
@@ -88,21 +70,20 @@ classDiagram
         +delete_client(id_user): None
     }
 
-    class FilmController {
+    class TMDBFilmController {
         +details_film(id_film): None
         +search_tmdb(query): List[Film]
         +get_film_details(id_film): Film
     }
 
 User *-- UserService
-User *-- List_movie
+Scout "1" o-- "*" Film
+UserService "1" o-- "*" Film
 User o-- Scout
-User *-- Liste_user
-Scout *-- List_movie
 Film *-- FilmService
 Film *-- FilmDAO
+Film *-- TMDBFilmController
 User *-- UserDAO
-FilmController *-- FilmService
-FilmController *-- FilmDAO
-Liste_user *-- User
-Liste_user *-- Scout
+FilmDAO --> TMDBFilmController
+FilmService --> FilmDAO
+Recommandation o-- Film
