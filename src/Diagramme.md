@@ -1,4 +1,24 @@
 classDiagram
+    class Film {
+        +id_film: int
+        +id_tmdb: int
+        +title: string
+        +producer: string
+        +category: string
+        +date: string
+        +average_rate: float
+        +ratings: List[int]
+        +calculation_mean(): float
+        +add_rating(rating: int): None
+    }
+
+    class List_movie {
+        +films: List[Film]
+        +add_film(Film): None
+        +remove_film(Film): None
+        +get_all_films(): List[Film]
+    }
+
     class User {
         +id_user: int
         +pseudo: string
@@ -33,23 +53,21 @@ classDiagram
     }
 
     class FilmDAO {
-        +url: string
-        +add_film(Film): None
-        +supp_film(Film): None
-        +search_commented_film(id_film): Film
+        +get_local_film(film_id: int): Film
+        +add_local_film(Film): None
     }
 
     class FilmService {
-        +search_film(str): Film
-        +add_grade(): None
-        +add_comment(): None
+        +search_film(query: string): Film
+        +add_grade(Film, Grade): None
+        +add_comment(Film, Comment): None
     }
 
     class UserDAO {
-        +add_user(id_user): None
-        +delete_user(id_user): None
-        +search_user(id_user): User
-        +update_user(id_user): None
+        +get_user(user_id: int): User
+        +add_user(User): None
+        +delete_user(user_id: int): None
+        +get_followers_of_scout(scout_id: int): List[User]
     }
 
     class UserService {
@@ -60,14 +78,7 @@ classDiagram
     }
 
     class Recommandation {
-        +id_film: int
-        +get_recommandation(id_film): List[Film]
-    }
-
-    class UserClient {
-        +log_in(): None
-        +add_client(id_user): None
-        +delete_client(id_user): None
+        +get_recommendation(film_id: int): List[Film]
     }
 
     class TMDBFilmController {
