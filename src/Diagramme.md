@@ -1,3 +1,7 @@
+# Diagramme de classe
+
+```mermaid
+---
 classDiagram
     class Film {
         +id_film: int
@@ -98,3 +102,5 @@ User *-- UserDAO
 FilmDAO --> TMDBFilmController
 FilmService --> FilmDAO
 Recommandation o-- Film
+
+```
