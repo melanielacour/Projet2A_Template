@@ -56,6 +56,7 @@ classDiagram
    
     Review "1" --> "1" FilmBD : "reviews"
     ScoutBD "1" --> "1" UserBD : "is"
+    UserBD "0..*" --> "0...*" ScoutBD: "follows"
     ScoutBD "0..*" --> "1" FilmBD : "recommends"
     SeenList "0..*" --> "1" FilmBD : "contains"
     Watchlist "0..*" --> "1" FilmBD : "contains"
