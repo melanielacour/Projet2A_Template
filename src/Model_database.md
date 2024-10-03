@@ -10,6 +10,7 @@ classDiagram
         +__id_user__: int
         +pseudo: string
         +password: string
+        +scout_list: list
     }
 
     class FilmBD {
