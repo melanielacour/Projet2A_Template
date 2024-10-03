@@ -2,7 +2,7 @@
 
 ```mermaid
 ---
-title: Class diagramm of PopcornCritic python_app
+title: Class diagram of PopcornCritic python_app
 ---
 classDiagram
     class Film {
@@ -22,7 +22,7 @@ classDiagram
         +id_film: int
         +id_user: int
         +add_review(): None
-        +delete_review(): Note
+        +delete_review(): None
     }
 
     class User {
@@ -45,17 +45,6 @@ classDiagram
         +add_recommended_films(Film): None
         +delete_recommended_films(Film): None
         +get_followers(): List[User]
-    }
-
-    class Film {
-        +id_film: int
-        +id_tmdb: int
-        +title: str
-        +producer: str
-        +category: str
-        +date: Date
-        +average_rate: float
-        +calculation_mean(): float
     }
 
     class FilmDAO {
@@ -94,17 +83,19 @@ classDiagram
         +get_film_details(id_film): Film
     }
 
+%% Relations entre les classes
 User *-- UserService
-User "1" --> "0..*" Review
-Review "1" --> "1" Film
-Scout "1" o-- "*" Film
-UserService "1" o-- "*" Film
-User o-- Scout
-Film *-- FilmService
-Film *-- FilmDAO
-Film *-- TMDBFilmController
-User *-- UserDAO
-FilmDAO --> TMDBFilmController
-FilmService --> FilmDAO
-Recommandation o-- Film
+User "1" --> "0..*" Review : "writes"
+Review "1" --> "1" Film : "reviews"
+Scout "1" o-- "*" Film : "recommends"
+UserService "1" o-- "*" Film : "manages"
+User o-- Scout : "follows"
+Film *-- FilmService : "handled by"
+Film *-- FilmDAO : "persisted by"
+Film *-- TMDBFilmController : "controlled by"
+User *-- UserDAO : "persisted by"
+FilmDAO --> TMDBFilmController : "used by"
+FilmService --> FilmDAO : "interacts with"
+Recommandation o-- Film : "suggests"
+
 ```
