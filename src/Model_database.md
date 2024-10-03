@@ -18,6 +18,7 @@ classDiagram
         +producer: string
         +category: string
         +release_date: Date
+        + Note: float
     }
 
     class Review {
