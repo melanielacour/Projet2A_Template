@@ -1,6 +1,8 @@
-# Diagramme de classe
+# Class diagramm
 
 ```mermaid
+---
+title: Class diagramm of PopcornCritic python_app
 ---
 classDiagram
     class Film {
