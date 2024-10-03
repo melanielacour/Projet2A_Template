@@ -18,11 +18,11 @@ classDiagram
         +add_rating(rating: int): None
     }
 
-    class List_movie {
-        +films: List[Film]
-        +add_film(Film): None
-        +remove_film(Film): None
-        +get_all_films(): List[Film]
+    class Review {
+        +id_film: int
+        +id_user: int
+        +add_review(): None
+        +delete_review(): Note
     }
 
     class User {
@@ -81,6 +81,7 @@ classDiagram
         +get_scouts(user_id): List[Scout]
         +get_seen_films(user_id): List[Film]
         +get_to_watch_films(user_id): List[Film]
+        +get_review(id_film, n): List[Review]
     }
 
     class Recommandation {
@@ -94,6 +95,8 @@ classDiagram
     }
 
 User *-- UserService
+User "1" --> "0..*" Review
+Review "1" --> "1" Film
 Scout "1" o-- "*" Film
 UserService "1" o-- "*" Film
 User o-- Scout
