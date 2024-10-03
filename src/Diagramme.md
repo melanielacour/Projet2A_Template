@@ -102,5 +102,5 @@ User *-- UserDAO
 FilmDAO --> TMDBFilmController
 FilmService --> FilmDAO
 Recommandation o-- Film
-
+---
 ```
