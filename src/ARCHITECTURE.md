@@ -6,7 +6,7 @@ title: Architecture of python app with classes
 ---
 graph LR
     USR((User)):::entity
-    DB[("fa:fa-database App Database \n (PostgreSQL) \n : FilmDB, UserDB")]:::database
+    DB[("fa:fa-database App Database \n (PostgreSQL) \n : FilmDB, UserDB, ScoutDB, Watchlist, Seenlist, Review")]:::database
     API(fa:fa-python API / \n WebService):::controller
     DAO(fa:fa-python DAO):::dao
     SVC(fa:fa-python Service / \n Controllers):::service
