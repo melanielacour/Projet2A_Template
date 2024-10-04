@@ -66,7 +66,7 @@ classDiagram
     }
 
     class UserService {
-        +log_in(id_user): None
+        +log_in(id_user, password): None
         +get_scouts(user_id): List[Scout]
         +get_seen_films(user_id): List[Film]
         +get_to_watch_films(user_id): List[Film]
