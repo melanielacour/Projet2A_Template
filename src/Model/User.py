@@ -31,8 +31,8 @@ class User:
     """
 
     def __init__(self, id_user: int, pseudo: str, password: str,
-                 seen : List[Film], to_watch : List[Film],
-                 scouts_list : List[Scout]):
+                 seen: List[Film], to_watch: List[Film],
+                 scouts_list: List[Scout]):
         """
         Initialise un nouvel utilisateur.
 
@@ -52,7 +52,6 @@ class User:
         self.to_watch = to_watch
         self.scouts_list = scouts_list
 
-
     def add_seen(self, film: 'Film'):
         """
         Ajoute un film à la liste des films vus par l'utilisateur.
@@ -63,7 +62,6 @@ class User:
             Le film à ajouter à la liste des films vus.
         """
         self.seen.append(film)
-
 
     def add_to_watch(self, film: 'Film'):
         """
