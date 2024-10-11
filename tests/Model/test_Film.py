@@ -55,4 +55,3 @@ class TestFilm:
         film.add_rating(7)
         film.add_rating(9)
         assert film.calculation_mean() == 7.0
-
