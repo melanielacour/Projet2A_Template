@@ -73,6 +73,9 @@ class User:
         -----------
         film : Film
             Le film à ajouter à la liste des films à voir.
+        
+        Returns : 
+            None
         """
         self.to_watch.append(film)
 
@@ -84,5 +87,8 @@ class User:
         -----------
         scout : Scout
             L'éclaireur à ajouter à la liste des éclaireurs suivis.
+
+        Returns :
+            
         """
         self.scouts_list.append(scout)
