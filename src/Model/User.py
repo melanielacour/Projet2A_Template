@@ -31,8 +31,13 @@ class User:
     """
 
     def __init__(self, id_user: int, pseudo: str, password: str,
+<<<<<<< HEAD
                  seen: List[Film], to_watch: List[Film],
                  scouts_list: List[Scout]):
+=======
+                 seen : List[Film], to_watch : List[Film],
+                 scouts_list = []):
+>>>>>>> 38a841e1a1a99e995b07691ebabf8029c854191e
         """
         Initialise un nouvel utilisateur.
 
@@ -71,10 +76,13 @@ class User:
         -----------
         film : Film
             Le film à ajouter à la liste des films à voir.
+        
+        Returns : 
+            None
         """
         self.to_watch.append(film)
 
-    def add_scout(self, scout: 'Scout'):
+    def add_scout(self, scout: Scout):
         """
         Ajoute un éclaireur à la liste des éclaireurs suivis par l'utilisateur.
 
@@ -82,5 +90,8 @@ class User:
         -----------
         scout : Scout
             L'éclaireur à ajouter à la liste des éclaireurs suivis.
+
+        Returns :
+            
         """
         self.scouts_list.append(scout)
