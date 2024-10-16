@@ -1,11 +1,7 @@
 class Singleton(type):
     """
-    -> https://refactoring.guru/fr/design-patterns/singleton
-    The Singleton class can be implemented in different ways in Python. Some
-    possible methods include: base class, decorator, metaclass. We will use the
-    metaclass because it is best suited for this purpose.
+    Une classe pour éviter d'ouvrir trop de conenxions en simultanée
     """
-
     _instances = {}
 
     def __call__(cls, *args, **kwargs):

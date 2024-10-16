@@ -33,7 +33,7 @@ class User:
     def __init__(self, id_user: int, pseudo: str, password: str, is_scout:bool,
                  seen : List[Film], to_watch : List[Film],
                  scouts_list = []):
->>>>>>> 38a841e1a1a99e995b07691ebabf8029c854191e
+
         """
         Initialise un nouvel utilisateur.
 
