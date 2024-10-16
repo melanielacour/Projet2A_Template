@@ -32,7 +32,8 @@ class User:
 
     def __init__(self, id_user: int, pseudo: str, password: str, is_scout:bool,
                  seen : List[Film], to_watch : List[Film],
-                 scouts_list : List[Scout]):
+                 scouts_list = []):
+>>>>>>> 38a841e1a1a99e995b07691ebabf8029c854191e
         """
         Initialise un nouvel utilisateur.
 
@@ -53,7 +54,6 @@ class User:
         self.to_watch = to_watch
         self.scouts_list = scouts_list
 
-
     def add_seen(self, film: 'Film'):
         """
         Ajoute un film à la liste des films vus par l'utilisateur.
@@ -65,7 +65,6 @@ class User:
         """
         self.seen.append(film)
 
-
     def add_to_watch(self, film: 'Film'):
         """
         Ajoute un film à la liste des films à voir par l'utilisateur.
@@ -74,10 +73,13 @@ class User:
         -----------
         film : Film
             Le film à ajouter à la liste des films à voir.
+        
+        Returns : 
+            None
         """
         self.to_watch.append(film)
 
-    def add_scout(self, scout: 'Scout'):
+    def add_scout(self, scout: Scout):
         """
         Ajoute un éclaireur à la liste des éclaireurs suivis par l'utilisateur.
 
@@ -85,5 +87,8 @@ class User:
         -----------
         scout : Scout
             L'éclaireur à ajouter à la liste des éclaireurs suivis.
+
+        Returns :
+            
         """
         self.scouts_list.append(scout)

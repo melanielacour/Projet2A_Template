@@ -34,7 +34,6 @@ classDiagram
         +scouts_list: List[Scout]
         +add_seen_film(Film) None
         +add_to_see_film(Film) None
-        +add_scout(Scout) None
     }
 
     class Scout {
@@ -67,14 +66,14 @@ classDiagram
 
     class UserService {
         +log_in(id_user, password) None
-        +get_scouts(user_id) List[Scout]
-        +get_seen_films(user_id) List[Film]
-        +get_to_watch_films(user_id) List[Film]
+        +get_scouts(id_user) List[Scout]
+        +get_seen_films(id_user) List[Film]
+        +get_to_watch_films(id_user) List[Film]
         +get_review(id_film, n) List[Review]
     }
 
     class Recommandation {
-        +get_recommendation(film_id: int) List[Film]
+        +get_recommendation(id_film: int) List[Film]
     }
 
     class TMDBFilmController {
@@ -82,6 +81,14 @@ classDiagram
         +search_tmdb(query) List[Film]
         +get_film_details(id_film) Film
     }
+
+    class UserFollowService {
+        +become_scout(id_user) None
+        +add_scout(id_user_follower, id_user_followed) None
+        +get_scouts(id_user) List[User]
+        +
+    }
+
 
 %% Relations entre les classes
 User *-- UserService
@@ -97,5 +104,5 @@ User *-- UserDAO : "persisted by"
 FilmDAO --> TMDBFilmController : "used by"
 FilmService --> FilmDAO : "interacts with"
 Recommandation o-- Film : "suggests"
-
+User *-- UserFollowService
 ```
