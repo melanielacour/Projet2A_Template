@@ -30,7 +30,7 @@ class User:
 
     """
 
-    def __init__(self, id_user: int, pseudo: str, password: str,
+    def __init__(self, id_user: int, pseudo: str, password: str, is_scout:bool,
                  seen : List[Film], to_watch : List[Film],
                  scouts_list : List[Scout]):
         """
@@ -48,6 +48,7 @@ class User:
         self.id_user = id_user
         self.pseudo = pseudo
         self.password = password
+        self.is_scout= is_scout
         self.seen = seen
         self.to_watch = to_watch
         self.scouts_list = scouts_list
