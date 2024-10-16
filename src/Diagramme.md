@@ -25,6 +25,7 @@ classDiagram
         +delete_review() None
     }
 
+
     class User {
         +id_user: int
         +pseudo: string
@@ -86,7 +87,6 @@ classDiagram
         +become_scout(id_user) None
         +add_scout(id_user_follower, id_user_followed) None
         +get_scouts(id_user) List[User]
-        +
     }
 
 

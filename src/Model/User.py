@@ -10,11 +10,13 @@ class User:
         Le pseudo de l'utilisateur.
     password : str
         Le mot de passe de l'utilisateur.
-    seen : List[Film]
+    is_scout : Bool
+        False par défaut : si l'utilisateur est un éclaireur
+    seen : list[Film]
         La liste des films que l'utilisateur a déjà vus.
-    to_watch : List[Film]
+    to_watch : list[Film]
         Une liste des films que l'utilisateur souhaite voir.
-    scouts_list : List[Scout]
+    scouts_list : list[Scout]
         Une liste d'éclaireurs que l'utilisateur suit.
 
     Méthodes:
@@ -30,9 +32,9 @@ class User:
 
     """
 
-    def __init__(self, id_user: int, pseudo: str, password: str, is_scout:bool,
-                 seen : List[Film], to_watch : List[Film],
-                 scouts_list = []):
+    def __init__(self, id_user: int, pseudo: str, password: str,
+                 is_scout: bool, seen: list[Film], to_watch: list[Film],
+                 scouts_list=[]):
 
         """
         Initialise un nouvel utilisateur.
@@ -49,7 +51,7 @@ class User:
         self.id_user = id_user
         self.pseudo = pseudo
         self.password = password
-        self.is_scout= is_scout
+        self.is_scout = False
         self.seen = seen
         self.to_watch = to_watch
         self.scouts_list = scouts_list
@@ -73,13 +75,13 @@ class User:
         -----------
         film : Film
             Le film à ajouter à la liste des films à voir.
-        
-        Returns : 
+
+        Returns :
             None
         """
         self.to_watch.append(film)
 
-    def add_scout(self, scout: Scout):
+    def add_scout(self, id_user: int):
         """
         Ajoute un éclaireur à la liste des éclaireurs suivis par l'utilisateur.
 
@@ -89,6 +91,6 @@ class User:
             L'éclaireur à ajouter à la liste des éclaireurs suivis.
 
         Returns :
-            
+
         """
-        self.scouts_list.append(scout)
+        self.scouts_list.append(id_user)
