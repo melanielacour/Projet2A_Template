@@ -24,12 +24,34 @@ class MovieDAO(metaclass=Singleton):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT title   "
-                    "FROM movies    "
-                    "WHERE id = %s", (id_film,))
+                    """SELECT title
+                    FROM movies
+                    WHERE id = %s""", (id_film,))
                 row = cursor.fetchone()
                 if row:
                     return Film(
                         title=row["title"]
                     )
                 return None
+
+    def add_local_movie(self, film):
+        """
+        Ajoute un film dans la base de données locale
+        Paramètre :
+        -----------
+        film : un objet de la classe Film
+        """
+        with DBConnection().connection as connection:
+            with connection.cursor() as cursor:
+                try:
+                    cursor.execute(
+                        """
+                     INSERT INTO movies (id_film,title,producer,category,date)
+                        VALUES (%s, %s, %s, %s, %s)
+                     """,
+                        (film.id_film, film.title, film.producer, film.category, film.date)
+                     )
+                    connection.commit()
+                except Exception as e:
+                    print(f"Erreur dans l'ajout dans la base de donneés de : {e}")
+                    connection.rollback()
