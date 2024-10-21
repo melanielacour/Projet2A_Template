@@ -1,10 +1,10 @@
-import os
-import sys
 from typing import List
+import sys
+import os
 
-from dao.db_connection import DBConnection
+from db_connection import DBConnection
 from Model.user_simple import UserSimple
-from utils.singleton import Singleton
+from .utils.singleton import Singleton
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -50,4 +50,6 @@ class UserDao(metaclass=Singleton):
         return user1
 
     #def create_user(self, pseudo, is_scout=False):
+
+print(UserDao.get_all_user_simple())
 

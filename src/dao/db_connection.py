@@ -1,14 +1,11 @@
-import os
-import sys
-
 import dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
-
-from utils.singleton import Singleton
+import sys
+import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+from utils.singleton import Singleton
 
 class DBconnection(metaclass=Singleton):
     """
@@ -32,3 +29,6 @@ class DBconnection(metaclass=Singleton):
         Retourne la connexion ouverte
         """
         return self.__connection
+
+
+
