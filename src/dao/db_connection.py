@@ -7,10 +7,8 @@ from psycopg2.extras import RealDictCursor
 
 from src.utils.singleton import Singleton
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
-class DBconnection(metaclass=Singleton):
+class DBConnection(metaclass=Singleton):
     """
     Une classe technique pour se connecter avec la base de données
     """
