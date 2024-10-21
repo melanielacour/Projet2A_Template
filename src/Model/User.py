@@ -1,3 +1,8 @@
+from typing import List
+
+from src.Model.Film import Film
+
+
 class User:
     """
     Classe qui représente un utilisateur dans PopcornCritic.

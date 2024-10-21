@@ -2,7 +2,8 @@ import hashlib
 import secrets
 from typing import Optional
 
-from src.DAO.UserRepo import UserRepo
+from src.dao.UserRepo import UserRepo
+from src.Model.Film import Film
 from src.Model.User import User
 
 
@@ -28,13 +29,13 @@ def check_password_strength(password: str):
     Lève une exception si le mot de passe ne respecte pas les critères.
     """
     if len(password) < 8:
-        raise Exception("Password length must be at least 8 characters")
+        raise ValueError("Password length must be at least 8 characters")
     if not any(c.islower() for c in password):
-        raise Exception("Password must contain at least one lowercase letter")
+        raise ValueError("Password must contain at least one lowercase letter")
     if not any(c.isupper() for c in password):
-        raise Exception("Password must contain at least one uppercase letter")
+        raise ValueError("Password must contain at least one uppercase letter")
     if not any(c.isdigit() for c in password):
-        raise Exception("Password must contain at least one digit")
+        raise ValueError("Password must contain at least one digit")
 
 def validate_username_password(username: str, password: str, user_repo: UserRepo) -> User:
     """
@@ -45,14 +46,8 @@ def validate_username_password(username: str, password: str, user_repo: UserRepo
 
     if not user_with_username:
         raise Exception(f"User with username {username} not found")
-
-    # Récupérer le sel et le mot de passe haché de l'utilisateur stocké
     salt_stored, hashed_password_stored = user_with_username.password.split('$')
-
-    # Hacher le mot de passe fourni avec le sel stocké
     hashed_password = hash_password(password, salt_stored).split('$')[1]
-
-    # Vérifier si le mot de passe haché correspond
     if hashed_password != hashed_password_stored:
         raise Exception("Incorrect password")
 
