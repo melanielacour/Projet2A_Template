@@ -37,12 +37,12 @@ def create_user(username: str, password: str) -> APIUser:
 @user_router.post("/jwt", status_code=status.HTTP_201_CREATED)
 def login(username: str, password: str) -> JWTResponse:
     """
-    Authentifie le nom d'utilisateur, le mot de passe et du jeton
+    Authentifie le nom d'utilisateur, le mot de passe et le jeton
     """
     try:
         user = validate_username_password(username=username, password=password, user_repo=user_repo)
     except Exception as error:
-        raise HTTPException(status_code=403, detail="Combinaison du mot de passe et de l'utilisateur incorrecte") from error
+        raise HTTPException(status_code=403, detail="Combinaison du mot de passe et du nom d'utilisateur incorrecte") from error
 
     return jwt_service.encode_jwt(user.id)
 
