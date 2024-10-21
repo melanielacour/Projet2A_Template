@@ -2,9 +2,9 @@ import os
 import sys
 from typing import List
 
-from dao.db_connection import DBConnection
-from Model.user_simple import UserSimple
-from utils.singleton import Singleton
+from src.dao.db_connection import DBConnection
+from src.Model.user_simple import UserSimple
+from src.utils.singleton import Singleton
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -29,7 +29,7 @@ class UserDao(metaclass=Singleton):
             )
             liste_user.append(user1)
         return {"users": liste_user}
-    
+
     def get_user_by_id(self,id):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
@@ -46,8 +46,7 @@ class UserDao(metaclass=Singleton):
                 id_user=row["id"],
                 pseudo=row["pseudo"],
                 is_scout=row["is.scout"],
-            ) 
+            )
         return user1
 
     #def create_user(self, pseudo, is_scout=False):
-

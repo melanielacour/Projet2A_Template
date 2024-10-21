@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class Film:
     """
     Cette classe représente un film avec ses attributs (titre, réalisateur,
@@ -19,7 +22,7 @@ class Film:
         Genre du film.
     date : str
         Date de sortie du film.
-    
+
     Méthodes:
     ---------
     calculation_mean(self): float
@@ -29,7 +32,8 @@ class Film:
         Ajoute une note a liste de données.
 
     """
-    def __init__(self, id_film: int, id_tmdb: int, title: str, producer: str, category: str, date: str):
+    def __init__(self, id_film: int, id_tmdb: int, title: str, producer: str,
+                 category: str, date: datetime):
         self.id_film = id_film
         self.id_tmdb = id_tmdb
         self.title = title
@@ -37,7 +41,7 @@ class Film:
         self.category = category
         self.date = date
         self.average_rate = 0.0
-        self.ratings: List[int] = []
+        self.ratings: list[int] = []
 
     def calculation_mean(self) -> float:
         """Calcule la note moyenne à partir des notes données au film, sachant des utlisateurs inscrits. """
@@ -46,16 +50,16 @@ class Film:
             return None
         self.average_rate = sum(self.ratings) / len(self.ratings)
         return self.average_rate
-        
+
 
     def add_rating(self, rating: int) -> None:
         """Ajoute une note à la liste et met à jour la note moyenne.
-        
+
         Paramètres:
         -----------
         rating : int
             La note à ajouter (doit être comprise entre 1 et 10)."""
-        
+
         if 1 <= rating <= 10:
             self.ratings.append(rating)
             self.calculation_mean()
