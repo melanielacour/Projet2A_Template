@@ -1,10 +1,11 @@
-from typing import List
-import sys
 import os
+import sys
+from typing import List
 
-from .db_connection import DBConnection
 from src.Model.user_simple import UserSimple
 from src.utils.singleton import Singleton
+
+from .db_connection import DBConnection
 
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 

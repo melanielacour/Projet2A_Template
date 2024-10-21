@@ -1,13 +1,15 @@
+import os
+import sys
+
 import dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import sys
-import os
 
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.utils.singleton import Singleton
 
-class DBConnection(metaclass=Singleton):
+
+class DBConnector(metaclass=Singleton):
     """
     Une classe technique pour se connecter avec la base de données
     """

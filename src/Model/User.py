@@ -53,13 +53,14 @@ class User:
         password : str
             Le mot de passe de l'utilisateur.
         """
-        self.id_user = id_user
+        self.id_user= id_user
         self.pseudo = pseudo
         self.password = password
         self.is_scout = False
         self.seen = seen
         self.to_watch = to_watch
         self.scouts_list = scouts_list
+        self.salt = salt
 
     def add_seen(self, film: 'Film'):
         """

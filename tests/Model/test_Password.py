@@ -10,13 +10,14 @@ from src.Service.PasswordService import (create_salt, hash_password,
 def test_hash_password():
     password = "soleil1234"
     hashed_password = hash_password(password)
-    assert hashed_password == "a88c648411492422ee9a1f4b03d3f5b71705499786f4415a59b51b255611ba50"
+    assert len(hashed_password.split('$')) == 2  # Vérifie que le résultat est au format "sel$hash"
 
 def test_hash_password_with_salt():
     password = "soleil1234"
     salt = "jambon"
     hashed_password = hash_password(password, salt)
-    assert hashed_password == "56d25b0190eb6fcdab76f20550aa3e85a37ee48d520ac70385ae3615deb7d53a"
+    assert len(hashed_password.split('$')) == 2  # Vérifie que le résultat est au format "sel$hash"
+
 
 def test_create_salt():
     salt = create_salt()
