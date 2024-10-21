@@ -1,12 +1,13 @@
-from typing import List
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from utils.singleton import Singleton
+import sys
+from typing import List
 
 from dao.db_connection import DBConnection
 from Model.user_simple import UserSimple
+from utils.singleton import Singleton
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 class UserDao(metaclass=Singleton):
     def get_all_user_simple(self):
@@ -17,7 +18,7 @@ class UserDao(metaclass=Singleton):
                     "FROM projet_2a.users;      "
         )
         res = cursor.fetchall()
-        
+
         liste_user = []
 
         for row in res:
