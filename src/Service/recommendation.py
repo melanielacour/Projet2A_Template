@@ -1,62 +1,53 @@
 import pandas as pd
-from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics.pairwise import cosine_similarity
-from base_series import BaseSeries
+from sklearn.preprocessing import MultiLabelBinarizer
+
+from src.Model.Movie import Movie
 
 
-def convert_to_dataframe(base_series):
-    """Convertion d'une base de séries de classe BaseSeries en pd.DataFrame.
+def convert_to_dataframe(movie):
+    """Convertion d'une base de séries de classe BaseMovie en pd.DataFrame.
 
     Parameters:
     -----------
-    base_series: BaseSeries
-        Base de données contenant les séries
+    movie: BaseMovie
+        Base de données contenant les films
 
     Return:
     -------
     pd.DataFrame
-        Dataframe contenant les séries.
+        Dataframe contenant les films.
 
     Examples:
     ---------
-    >>> base_series = BaseSeries()
-    >>> base_series.load_from_path("dat_test.csv")
+    >>> base_movies = BaseMovie()
+    >>> base_movies.load_from_path("dat_test.csv")
     Base de données chargée avec succès depuis dat_test.csv.
-    >>> base_series = convert_to_dataframe(base_series)
-    >>> print(type(base_series))
+    >>> base_movies = convert_to_dataframe(base_movies)
+    >>> print(type(base_movies))
     <class 'pandas.core.frame.DataFrame'>
     """
     data = {
-        "name": [],
-        "number_of_seasons": [],
-        "number_of_episodes": [],
-        "genres": [],
-        "languages": [],
-        "networks": [],
-        "adult": [],
-        "status": []
+        "title": [],
+        "producer": [],
+        "date": []
     }
 
-    for serie in base_series.series.values():
-        data["name"].append(serie.name)
-        data["number_of_seasons"].append(serie.number_of_seasons)
-        data["number_of_episodes"].append(serie.number_of_episodes)
-        data["genres"].append(serie.genres)
-        data["languages"].append(serie.spoken_languages)
-        data["networks"].append(serie.networks)
-        data["adult"].append(serie.adult)
-        data["status"].append(serie.status)
+    for film in base_movies.movies.values():
+        data["title"].append(movie.title)
+        data["producer"].append(movie.producer)
+        data["date"].append(movie.date)
     return pd.DataFrame(data)
 
 
-def classification(base_series, nom_serie, n=10):
+def classification(base_movies, title, n=10):
     """Proposer les n séries les plus similaires à celle précisée.
 
     Parameters:
     -----------
-    base_series: BaseSeries
+    base_movies: BaseSeries
         Base de données contenant les séries.
-    nom_serie: str
+    title: str
         Nom de la série intéressée
     n: int
         Nombre de séries à recommander
@@ -68,17 +59,18 @@ def classification(base_series, nom_serie, n=10):
 
     Examples:
     ---------
-    >>> base_series = BaseSeries()
-    >>> base_series.load_from_path("dat_test.csv")
+    >>> base_movies = BaseMovies()
+    >>> base_movies.load_from_path("dat_test.csv")
     Base de données chargée avec succès depuis dat_test.csv.
-    >>> nom_serie = "The Simpsons"
+    >>> title = "The Simpsons"
     >>> n = 1
-    >>> classifier = classification(base_series, nom_serie, n)
-    Les 1 séries recommandées sont :
+    >>> classifier = classification(base_movies, title, n)
+    Les 1 films recommandés sont :
     - Law & Order: Special Victims Unit
     >>> classifier
     ['Law & Order: Special Victims Unit']
     """
+    ###############################################################################
     if not isinstance(base_series, BaseSeries):
         raise TypeError("La base de données doit être une instance de "
                         "BaseSeries.")

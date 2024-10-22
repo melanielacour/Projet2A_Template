@@ -4,7 +4,7 @@ from Movie import Movie
 
 class recomandation:
     """
-    Classe qui représente la méthode pour avoir une recommandation.
+    Classe qui représente les méthodes pour avoir une recommandation.
 
     Méthodes:
     ---------
