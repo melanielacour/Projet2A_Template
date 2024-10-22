@@ -29,6 +29,7 @@ def json_to_dataframe(movies_json):
 
     return movies_df
 
+
 def classification(movies_json):
     '''
     Effectue une classification pour obtenir un dataframe des similarités entre chaque films.
@@ -91,6 +92,7 @@ def classification(movies_json):
 
     return similarity_df
 
+
 def recommend_movies(movie_title, movies_json, n=10):
     '''
     Renvoie la liste de recommendations des n films avec le plus gros score de similarités.
@@ -114,13 +116,13 @@ def recommend_movies(movie_title, movies_json, n=10):
 
     # Obtenir les similarités pour le film donné
     similarity_scores = similarity_df[movie_title]
-    
+
     # Trier les films par similarité (du plus similaire au moins similaire)
     similarity_scores_desc = similarity_scores.sort_values(ascending=False)
-    
+
     # Exclure le film lui-même de la liste
     similarity_scores_desc = similarity_scores_desc.drop(movie_title)
-    
+
     # Prends les n meilleures recommandations après le tri et l'exclusion du film lui même
     recommendations = similarity_scores_desc.head(n).index.tolist()
 
