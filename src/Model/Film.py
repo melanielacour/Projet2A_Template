@@ -1,6 +1,6 @@
-from datetime import datetime
-from typing import List
-
+class ValidationError(Exception):
+    """Exception levée pour les erreurs de validation."""
+    pass
 
 class Film:
     """
@@ -23,51 +23,56 @@ class Film:
         Genre du film.
     date : str
         Date de sortie du film.
-
+    
     Méthodes:
     ---------
-    calculation_mean(self) -> float:
+    calculation_mean(self): float
         Calcule la note moyenne.
 
     add_rating(self, rating: int) -> None:
         Ajoute une note à la liste de données.
     """
+    
+    def __init__(self, id_film, id_tmdb: int, title: str, producer: str, category: str, date: str):
+        # Vérifiez que id_film est un entier, sinon levez une ValidationError
+        if not isinstance(id_film, int):
+            try:
+                # Essayez de convertir id_film en entier
+                self.id_film = int(id_film)  # Convertit id_film en entier
+            except ValueError:
+                raise ValueError("id_film must be an integer, unable to parse string as an integer")
+        else:
+            self.id_film = id_film  # Si c'est déjà un entier, assignez-le directement
 
+        # Vérifiez que id_tmdb est un entier
+        if not isinstance(id_tmdb, int):
+            raise ValueError("id_tmdb must be an integer")
 
-    def __init__(self, id_film: int, id_tmdb: int, title: str, producer: str,
-                 category: str, date: datetime):
-        self.id_film = id_film
         self.id_tmdb = id_tmdb
         self.title = title
         self.producer = producer
         self.category = category
         self.date = date
         self.average_rate = 0.0
-
+        self.ratings: list[int] = []
 
     def calculation_mean(self) -> float:
-        """Calcule la note moyenne à partir des notes données au film.
-        
-        Retourne:
-        ---------
-        float: La note moyenne du film ou 0.0 si aucune note n'a été donnée.
-        """
+        """Calcule la note moyenne à partir des notes données au film."""
         if not self.ratings:
-            return 0.0  # Retourne 0.0 si aucune note n'est disponible
+            return None
         self.average_rate = sum(self.ratings) / len(self.ratings)
         return self.average_rate
-
+        
     def add_rating(self, rating: int) -> None:
         """Ajoute une note à la liste et met à jour la note moyenne.
-
+        
         Paramètres:
         -----------
         rating : int
-            La note à ajouter (doit être comprise entre 1 et 10).
-        """
-
+            La note à ajouter (doit être comprise entre 1 et 10)."""
+        
         if 1 <= rating <= 10:
             self.ratings.append(rating)
-            self.calculation_mean()  # Met à jour la note moyenne après ajout
+            self.calculation_mean()
         else:
-            raise ValueError("La note doit être comprise entre 1 et 10.")
+            raise ValueError("la note doit etre comprise entre 1 et 10")

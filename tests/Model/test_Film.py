@@ -55,3 +55,14 @@ class TestFilm:
         film.add_rating(7)
         film.add_rating(9)
         assert film.calculation_mean() == 7.0
+
+
+
+def test_movie_constructor_ok():
+    the_shining = Film(id_film=12, id_tmdb=100, title="The Shining", producer="Stanley Kubrick", category="Horror", date="1980-05-23")
+    assert the_shining.id_film == 12
+    assert the_shining.title == "The Shining"
+
+def test_film_constructor_throws_on_incorrect_input(): 
+    with pytest.raises(ValueError, match="id_film must be an integer, unable to parse string as an integer"):
+        Film(id_film="Twelve", id_tmdb=100, title="Dracula", producer="Bram Stoker", category="Horror", date="1897-05-26")
