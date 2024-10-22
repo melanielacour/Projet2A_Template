@@ -102,8 +102,8 @@ class UserDao(metaclass=Singleton):
                 is_scout=is_scout,
                 pswd=pswd
             )
-            return user1
-        return None
+            return True
+        return False
 
 
 

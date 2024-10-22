@@ -1,6 +1,6 @@
 import pytest
 
-from Model.review import Review
+from src.Model.Review import Review
 
 
 def test_review_constructor_ok():
@@ -8,5 +8,5 @@ def test_review_constructor_ok():
     assert review_1.id_review == 1
     assert review_1.id_film == 2
     assert review_1.id_user == 5
-    assert review_1.review == "Super Film"
+    assert review_1.review == "Super film"
 
