@@ -4,6 +4,7 @@ import sys
 from Film import Film
 
 from dao.db_connection import DBConnection
+from src.Model.film_simple import FilmSimple
 from utils.singleton import Singleton
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,14 +25,17 @@ class MovieDAO(metaclass=Singleton):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """SELECT title
-                    FROM movies
-                    WHERE id = %s""", (id_film,))
+                    "SELECT *                    "
+                    "FROM movies                 "
+                    "WHERE id = %(id_film)s      ",
+                )
                 row = cursor.fetchone()
                 if row:
-                    return Film(
-                        title=row["title"]
+                    film= FilmSimple(
+                        id_film= row["id_film"]
+
                     )
+                    return row
                 return None
 
     def add_local_movie(self, film):
