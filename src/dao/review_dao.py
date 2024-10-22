@@ -2,7 +2,7 @@ from src.dao.db_connection import DBConnection
 from src.Model.Review import Review
 from src.utils.singleton import Singleton
 
-from Model.Movie import Movie
+from src.Model.Movie import Movie
 
 
 class ReviewDao(metaclass=Singleton):
@@ -27,13 +27,14 @@ class ReviewDao(metaclass=Singleton):
                 )
             liste_review.append(review1)
 
-    def get_all_review_by_title(self, movie.title):
+    def get_all_review_by_title(self, title):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM projet_2a.review"
-                    "INNER JOIN projet_2a.film ON review.id_film = Movie.id_film"
-                    "WHERE Movie.title = %(title)s;                   ",
+                    "SELECT * FROM projet_2a.review                       "
+                    "FROM projet_2a.film                                  "
+                    "JOIN projet_2a.review ON review.id_film = film.id      "
+                    "WHERE title = %(title)s;                             ",
                     {"title":title}
                 )
         liste_review = []

@@ -1,6 +1,5 @@
 from unittest import mock
 from unittest.mock import MagicMock
-
 import pytest
 
 from src.dao.review_dao import ReviewDao

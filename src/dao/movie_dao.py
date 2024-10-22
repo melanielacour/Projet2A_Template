@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 class MovieDAO(metaclass=Singleton):
-    def get_local_movie(self, id_film: int):
+    def get_local_movie_by_id(self, id_film: int):
         """
         Récupère le nom du film à partir de son ID.
         Paramètre:
@@ -28,23 +28,55 @@ class MovieDAO(metaclass=Singleton):
                     "SELECT *                    "
                     "FROM movies                 "
                     "WHERE id = %(id_film)s      ",
+                    {"id_film": id_film},
                 )
                 row = cursor.fetchone()
                 if row:
                     film= FilmSimple(
-                        id_film= row["id_film"]
-
+                        id_film= row["id_film"],
+                        id_tmdb=row["id_tmdb"],
+                        title=["title"]
+                    )
+                    return row
+                return None
+    def get_local_movie_by_idtmdb(self, id_tmdb:int):
+        """
+        Récupère le nom du film à partir de son ID.
+        Paramètre:
+        ---------
+         id_film:  L'ID du film à rechercher.
+        Return:
+        -------
+        Une instance de UserSimple avec le titre du film,
+                ou None si le film n'existe pas.
+        """
+        with DBConnection().connection as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT *                         "
+                    "FROM movies                      "
+                    "WHERE id_tmdb = %(id_tmdb)s      ",
+                    {"id_tmdb": id_tmdb},
+                    
+                )
+                row = cursor.fetchone()
+                if row:
+                    film= FilmSimple(
+                        id_film= row["id_film"],
+                        id_tmdb=row["id_tmdb"],
+                        title=["title"]
                     )
                     return row
                 return None
 
-    def add_local_movie(self, film):
+    def add_local_movie(self,title,id_tmdb):
         """
         Ajoute un film dans la base de données locale
         Paramètre :
         -----------
         film : un objet de la classe Film
         """
+        film= self.get_local_movie_by_title()
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 try:
