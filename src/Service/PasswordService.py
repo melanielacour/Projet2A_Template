@@ -37,18 +37,20 @@ def check_password_strength(password: str):
     if not any(c.isdigit() for c in password):
         raise ValueError("Password must contain at least one digit")
 
-def validate_username_password(username: str, password: str, user_repo: UserRepo) -> User:
+def validate_pseudo_password(pseudo: str, password: str, user_repo: UserRepo) -> User:
     """
     Valide le nom d'utilisateur et le mot de passe.
     Lève une exception si la validation échoue.
     """
-    user_with_username: Optional[User] = user_repo.get_by_username(username=username)
+    user_with_pseudo: Optional[User] = user_repo.get_by_pseudo(pseudo=pseudo)
 
-    if not user_with_username:
-        raise Exception(f"User with username {username} not found")
-    salt_stored, hashed_password_stored = user_with_username.password.split('$')
+    if not user_with_pseudo:
+        raise Exception(f"User with pseudo {pseudo} not found")
+    
+    salt_stored, hashed_password_stored = user_with_pseudo.password.split('$')
     hashed_password = hash_password(password, salt_stored).split('$')[1]
+    
     if hashed_password != hashed_password_stored:
         raise Exception("Incorrect password")
 
-    return user_with_username
+    return user_with_pseudo
