@@ -47,8 +47,9 @@ def validate_pseudo_password(pseudo: str, password: str, user_repo: UserRepo) ->
     if not user_with_pseudo:
         raise Exception(f"User with pseudo {pseudo} not found")
     
-    salt_stored, hashed_password_stored = user_with_pseudo.password.split('$')
-    hashed_password = hash_password(password, salt_stored).split('$')[1]
+    salt_stored = user_with_pseudo.password[:256]  # Longueur du sel (256 hex characters = 128 bytes)
+    hashed_password_stored = user_with_pseudo.password[256:] 
+    hashed_password = hash_password(password, salt_stored)[256:] 
     
     if hashed_password != hashed_password_stored:
         raise Exception("Incorrect password")
