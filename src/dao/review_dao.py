@@ -1,8 +1,7 @@
 from src.dao.db_connection import DBConnection
+from src.Model.Movie import Movie
 from src.Model.Review import Review
 from src.utils.singleton import Singleton
-
-from src.Model.Movie import Movie
 
 
 class ReviewDao(metaclass=Singleton):
@@ -10,7 +9,7 @@ class ReviewDao(metaclass=Singleton):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM projet_2a.review"
+                    "SELECT id_review,id_user,id_film,comment FROM projet_2a.review          "
                     "WHERE id_film = %(id_film)s;            ",
                     {"id_film": id_film}
                 )
@@ -23,20 +22,22 @@ class ReviewDao(metaclass=Singleton):
                 id_review=row["id_review"],
                 id_film=row["id_film"],
                 id_user=row["id_user"],
-                review=row["review"]
+                comment=row["comment"]
                 )
             liste_review.append(review1)
+
+        return liste_review
 
     def get_all_review_by_title(self, title):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM projet_2a.review                       "
-                    "FROM projet_2a.film                                  "
-                    "JOIN projet_2a.review ON review.id_film = film.id      "
-                    "WHERE title = %(title)s;                             ",
-                    {"title":title}
+                    "SELECT * FROM projet_2a.film                                  "
+                    "JOIN projet_2a.review ON review.id_film = film.id            "
+                    "WHERE film.title = %(title)s;                                 ",
+                    {"title": title}
                 )
+            res = cursor.fetchall()
         liste_review = []
 
         for row in res:
@@ -47,6 +48,7 @@ class ReviewDao(metaclass=Singleton):
                 review=row["review"]
                 )
             liste_review.append(review1)
+            return liste_review
 
 
     def add_review(self, review_text: str):
