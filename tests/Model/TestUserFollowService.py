@@ -1,6 +1,6 @@
 import pytest
 
-from src.Model.user import User
+from src.Model.User import User
 from src.Model.UserFollowService import UserFollowService
 
 
@@ -35,4 +35,7 @@ class TestUserFollowService:
         service.add_scout(2, 1)
 
         # Then
-        assert ... # A FINIR
+        assert 1 in service.scouts[2]  # Vérifie que user2 suit user1
+        assert len(service.scouts[2]) == 1  # Vérifie que user2 suit 1 scout
+        assert service.scouts[2][0] == 1  # Vérifie que le scout suivi est bien user1
+
