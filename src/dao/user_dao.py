@@ -1,10 +1,23 @@
-from typing import List
-import sys
 import os
+import sys
+from typing import List
 
-from .db_connection import DBConnection
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+from src.dao.db_connection import DBConnection
 from src.Model.user_simple import UserSimple
 from src.utils.singleton import Singleton
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+=======
+from .db_connection import DBConnection
+>>>>>>> 718e5441b4ed547c53f39a7138cfb0e56d2bf412
+from src.Model.user_simple import UserSimple
+from src.utils.singleton import Singleton
+>>>>>>> e6784a4314da02d296335136863e79187dbd07d7
+
+from .db_connection import DBConnection
 
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -28,8 +41,13 @@ class UserDao(metaclass=Singleton):
             )
             liste_user.append(user1)
         return {"users": liste_user}
+<<<<<<< HEAD
+
+    def get_user_by_id(self,id):
+=======
     
     def get_user_by_id(self, id):
+>>>>>>> e6784a4314da02d296335136863e79187dbd07d7
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -40,6 +58,16 @@ class UserDao(metaclass=Singleton):
                 res = cursor.fetchone()
 
         if res:
+<<<<<<< HEAD
+            user1=UserSimple(
+                id_user=row["id"],
+                pseudo=row["pseudo"],
+                is_scout=row["is.scout"],
+            )
+        return user1
+
+    #def create_user(self, pseudo, is_scout=False):
+=======
             user1 = UserSimple(
                 id_user=res["id"],
                 pseudo=res["pseudo"],
@@ -99,3 +127,4 @@ class UserDao(metaclass=Singleton):
             )
             return user1
         return None
+>>>>>>> e6784a4314da02d296335136863e79187dbd07d7

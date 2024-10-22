@@ -1,13 +1,18 @@
+import os
+import sys
+
 import dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import sys
-import os
 
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.utils.singleton import Singleton
 
+
+<<<<<<< HEAD:src/dao/DBConnector.py
+class DBConnector(metaclass=Singleton):
+=======
 class DBConnection(metaclass=Singleton):
+>>>>>>> 718e5441b4ed547c53f39a7138cfb0e56d2bf412:src/dao/db_connection.py
     """
     Une classe technique pour se connecter avec la base de données
     """
@@ -29,6 +34,3 @@ class DBConnection(metaclass=Singleton):
         Retourne la connexion ouverte
         """
         return self.__connection
-
-
-
