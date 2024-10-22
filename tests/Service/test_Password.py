@@ -41,7 +41,7 @@ def test_create_salt():
     assert len(salt) == 256
 
 def test_validate_pseudo_password_is_ok():
-    janjak = validate_pseudo_password("janjak", "Jambon1234", user_repo)  # Assurez-vous que le mot de passe correspond ici
+    janjak = validate_pseudo_password("janjak", "Jambon1234", user_repo)
     assert janjak.id_user == 4
 
 def test_validate_pseudo_password_unknown_user():
@@ -51,20 +51,19 @@ def test_validate_pseudo_password_unknown_user():
 
 def test_validate_pseudo_password_incorrect_password():
     with pytest.raises(Exception) as exception_info:
-        # Utilisez un mot de passe qui ne correspond pas au mot de passe stocké
-        validate_pseudo_password("janjak", "IncorrectPassword1", user_repo)  # Ceci doit lever l'exception "Incorrect password"
+        validate_pseudo_password("janjak", "IncorrectPassword1", user_repo)
     assert str(exception_info.value) == "Incorrect password"
 
 
 def test_validate_pseudo_password_invalid_format():
     with pytest.raises(ValueError) as exception_info:
-        validate_pseudo_password("janjak", "invalid@password", user_repo)  # Contient des caractères spéciaux
+        validate_pseudo_password("janjak", "invalid@password", user_repo) 
     assert str(exception_info.value) == "Password must contain only letters and digits (no special characters)"
 
 
 def test_validate_pseudo_password_too_short(): 
     with pytest.raises(ValueError) as exception_info:
-        validate_pseudo_password("janjak", "short", user_repo)  # Trop court
+        validate_pseudo_password("janjak", "short", user_repo) 
     assert str(exception_info.value) == "Password length must be at least 8 characters"
 
 
