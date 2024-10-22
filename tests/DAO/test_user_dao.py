@@ -1,3 +1,4 @@
+import time
 import pytest
 from unittest import mock
 from src.dao.user_dao import UserDao
@@ -28,7 +29,7 @@ def test_create_user(mock_db_connection, mocker):
     mock_db_connection.fetchone.return_value = {"id_users": 1}  # Simuler un ID retourné après insertion
 
     # Tester la création d'un utilisateur avec un pseudo unique
-    new_user = user_dao.create_user("new_user9", is_scout=True, pswd="pajios13")
+    new_user = user_dao.create_user(f"test{time.time()}", is_scout=True, pswd="pajios13")
 
 
     assert new_user is True
