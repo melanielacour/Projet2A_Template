@@ -9,13 +9,14 @@ from src.Service.UserService import (UserService, average_rate,
 
 
 def test_register_user_success():
+    # on teste le succès de l'inscription d'un nouvel utilisateur.
     mock_user_dao = Mock()
     mock_password_service = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=mock_password_service)
 
     mock_user_dao.get_user_by_pseudo.return_value = None  # L'utilisateur n'existe pas encore
     mock_password_service.validate_password.return_value = True  # Le mot de passe est valide
-    mock_user_dao.create_user.return_value = True  # Simulation de la création réussie de l'utilisateur
+    mock_user_dao.create_user.return_value = True  # Création réussie de l'utilisateur
 
     result = user_service.register_user(pseudo="new_user", password="ValidPassword123", is_scout=False)
 
@@ -27,32 +28,30 @@ def test_register_user_success():
 
 
 def test_register_user_existing_pseudo():
+    # on teste l'inscription d'un utilisateur avec un pseudo déjà utilisé.
     mock_user_dao = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=Mock())
 
-    # Créez un utilisateur avec tous les arguments nécessaires
+    # on a initié un utlisateur avec les caractéristiques suivantes : 
     mock_user_dao.get_user_by_pseudo.return_value = User(
         id_user=1,
         pseudo="existing_user",
-        password="password",  # Assurez-vous que c'est 'password' et pas 'pswd'
+        password="password",  
         is_scout=False,
-        seen=[],  # Liste vide pour le test
-        to_watch=[],  # Liste vide pour le test
-        scouts_list=[]  # Liste vide pour le test
+        seen=[],  
+        to_watch=[],  
+        scouts_list=[] 
     )
     
-    # Vérifiez si l'exception est levée
     with pytest.raises(ValueError, match="Cet identifiant est déjà utilisé."):
         user_service.register_user(pseudo="existing_user", password="Password123", is_scout=False)
 
-    # Vérification que la méthode a été appelée avec le bon pseudo
     mock_user_dao.get_user_by_pseudo.assert_called_once_with("existing_user")
 
 
 
-
-
 def test_register_user_invalid_password():
+    # on teste l'inscription avec un mot de passe invalide.
     mock_user_dao = Mock()
     mock_password_service = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=mock_password_service)
@@ -64,6 +63,7 @@ def test_register_user_invalid_password():
         user_service.register_user(pseudo="new_user", password="invalidpassword", is_scout=False)
 
     mock_password_service.validate_password.assert_called_once_with("invalidpassword")
+
 
 
 def test_log_in_success():
@@ -81,8 +81,8 @@ def test_log_in_success():
         scouts_list=[]  # Liste vide pour le test
     )
     
-    mock_user_dao.get_user_by_pseudo.return_value = user  # L'utilisateur existe
-    mock_password_service.validate_password.return_value = True  # Simulation d'un mot de passe valide
+    mock_user_dao.get_user_by_pseudo.return_value = user  
+    mock_password_service.validate_password.return_value = True 
 
     result = user_service.log_in(pseudo="existing_user", password="ValidPassword123")
 
@@ -96,7 +96,7 @@ def test_log_in_invalid_pseudo():
     mock_user_dao = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=Mock())
 
-    mock_user_dao.get_user_by_pseudo.return_value = None  # L'utilisateur n'existe pas
+    mock_user_dao.get_user_by_pseudo.return_value = None
 
     with pytest.raises(ValueError, match="Identifiant incorrect."):
         user_service.log_in(pseudo="nonexistent_user", password="ValidPassword123")
@@ -109,24 +109,24 @@ def test_log_in_invalid_password():
     mock_password_service = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=mock_password_service)
 
-    # Créez un utilisateur avec le mot de passe correct
+    # on a un utilisateur avec un mot de passe correct
     user = User(
         id_user=1,
         pseudo="existing_user",
         password="ValidPassword123",  # Assurez-vous que c'est 'password'
         is_scout=False,
-        seen=[],  # Liste vide pour le test
-        to_watch=[],  # Liste vide pour le test
-        scouts_list=[]  # Liste vide pour le test
+        seen=[], 
+        to_watch=[], 
+        scouts_list=[]  
     )
 
-    mock_user_dao.get_user_by_pseudo.return_value = user  # L'utilisateur existe
+    mock_user_dao.get_user_by_pseudo.return_value = user
 
     # Configurez le mock pour que validate_password retourne False pour le mot de passe incorrect
-    mock_password_service.validate_password.return_value = False  # Simulez un mot de passe incorrect
+    mock_password_service.validate_password.return_value = False 
 
     with pytest.raises(ValueError, match="Mot de passe incorrect."):
-        user_service.log_in(pseudo="existing_user", password="WrongPassword123")  # Mot de passe incorrect
+        user_service.log_in(pseudo="existing_user", password="WrongPassword123") 
 
     mock_user_dao.get_user_by_pseudo.assert_called_once_with("existing_user")
     mock_password_service.validate_password.assert_called_once_with("WrongPassword123", "ValidPassword123")

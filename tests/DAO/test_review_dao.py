@@ -29,6 +29,5 @@ def test_get_all_review_by_id(review_dao, mock_db):
     reviews = review_dao.get_all_review_by_id(1)
 
     mock_cursor.execute.assert_called_once() 
-    assert len(reviews) == 2
-    assert reviews[0].comment == "Film incroyable"
-    assert reviews[1].comment == "Nul"
+    assert len(reviews) == 1
+

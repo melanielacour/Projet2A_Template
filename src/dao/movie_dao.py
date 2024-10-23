@@ -1,11 +1,9 @@
 import os
 import sys
 
-from Film import Film
-
-from dao.db_connection import DBConnection
+from src.dao.db_connection import DBConnection
 from src.Model.film_simple import FilmSimple
-from utils.singleton import Singleton
+from src.utils.singleton import Singleton
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -26,18 +24,18 @@ class MovieDAO(metaclass=Singleton):
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT *                    "
-                    "FROM movies                 "
+                    "FROM projet_2a.film         "
                     "WHERE id = %(id_film)s      ",
                     {"id_film": id_film},
                 )
                 row = cursor.fetchone()
                 if row:
                     film= FilmSimple(
-                        id_film= row["id_film"],
+                        id_film= row["id"],
                         id_tmdb=row["id_tmdb"],
                         title=["title"]
                     )
-                    return row
+                    return film
                 return None
 
     def get_local_movie_by_idtmdb(self, id_tmdb:int):
@@ -55,7 +53,7 @@ class MovieDAO(metaclass=Singleton):
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT *                         "
-                    "FROM movies                      "
+                    "FROM projet_2a.film              "
                     "WHERE id_tmdb = %(id_tmdb)s      ",
                     {"id_tmdb": id_tmdb},
                     
@@ -63,32 +61,44 @@ class MovieDAO(metaclass=Singleton):
                 row = cursor.fetchone()
                 if row:
                     film= FilmSimple(
-                        id_film= row["id_film"],
+                        id_film= row["id"],
                         id_tmdb=row["id_tmdb"],
-                        title=["title"]
+                        title=row["title"]
                     )
-                    return row
+                    return film
                 return None
 
-    def add_local_movie(self,title,id_tmdb):
+    def add_local_movie(self,id_tmdb,title):
         """
         Ajoute un film dans la base de données locale
         Paramètre :
         -----------
         film : un objet de la classe Film
         """
-        film= self.get_local_movie_by_title()
+        film= self.get_local_movie_by_idtmdb(id_tmdb)
+        if film:
+            raise ValueError("Film déja présent dans la base de données")
+        
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
-                try:
                     cursor.execute(
-                        """
-                     INSERT INTO movies (id_film,title,producer,category,date)
-                        VALUES (%s, %s, %s, %s, %s)
-                     """,
-                        (film.id_film, film.title, film.producer, film.category, film.date)
-                     )
-                    connection.commit()
-                except Exception as e:
-                    print(f"Erreur dans l'ajout dans la base de donneés de : {e}")
-                    connection.rollback()
+                    "INSERT INTO projet_2a.film (id_tmdb, title)          "
+                    "VALUES (%(id_tmdb)s, %(title)s)                      "
+                    "RETURNING id;                                        ",
+                    {
+                        "id_tmdb": id_tmdb,
+                        "title": title
+                    },
+                    )
+                    res1 = cursor.fetchone()
+        if res1:
+            film= FilmSimple(
+                        id_film= res1["id"],
+                        id_tmdb=id_tmdb,
+                        title=title
+                    )
+            return True
+        return False
+
+            
+print(MovieDAO().get_local_movie_by_idtmdb(272025))
