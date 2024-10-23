@@ -7,13 +7,8 @@ from src.Service.PasswordService import PasswordService
 class UserService:
     def register_user(self, pseudo: str, password: str, is_scout: bool = False) -> str:
         """
-<<<<<<< HEAD
-        Inscrit un nouvel utilisateur avec un identifiant unique et un mot de passe sécurisé.
-
-=======
         Cette méthode Initialise le service avec un UserDAO pour gérer les données des utilisateurs
         et un PasswordService pour valider les mots de passe.
->>>>>>> acced5b474e0fc60e795b725ddbd283b340b0a69
 
         Paramètres:
         -----------
@@ -23,6 +18,7 @@ class UserService:
             Le mot de passe de l'utilisateur.
         is_scout : bool, optional
             Indique si l'utilisateur est un éclaireur (scout). Par défaut, False.
+
 
         Retourne:
         ---------
@@ -99,6 +95,7 @@ class UserService:
 h=UserService()
 print(h.log_in("Celeste", "Password987"))
 =======
+>>>>>>> 3c355fb49a80f44a6ba97161c6f5b258b4f5a5f1
     Paramètres:
     -----------
     title : str
@@ -155,8 +152,60 @@ def get_review_by_title(title, n=10):
 
     if n > len(L):
         n = len(L)
-    # Création d'un échantillon aléatoire de n dictionnaires de L
-    echantillon = random.sample(L, n)
 
+<<<<<<< HEAD
+        # Si L est vide on relève une erreur
+        if n == 0:
+            return f"Aucune note disponible pour le film '{title}'."
+
+        # Calcul de la somme des notes
+        somme = sum(d['note'] for d in L)
+
+        # Calcul de la moyenne
+        moy = somme / n
+
+        # On limite le calcule de la moyenne à deux chiffres après la virgule
+        return f"La note moyenne de '{title}' est de {moy:.2f}."
+
+    def get_review_by_title(title, n=10):
+        """
+        Récupère aléatoirement les commentaires et notes de n user pour un
+        film donné.
+
+        Parametres:
+        -----------
+        title : str
+            titre du film duquel on souhaite voir quelques commentaires
+            et notes.
+        n : int
+            nombre total de commentaires ou notes que l'on souhaite voir.
+
+        Returns:
+        --------
+        echantillon_complet : list[dict]
+            liste de n dictionnaires avec comme clés id_user, comment et note.
+        """
+        review_list = ReviewDao.get_all_review_by_title(title)
+        L = []
+
+        for row in review_list:
+            id_user = row.id_user
+            note = row.note
+            comment = row.comment
+
+            # On ne retient seulement les notes et id_user où un commentaire
+            # est écrit
+            if comment:
+                d = {'id_user': id_user, 'note': note, 'comment': comment}
+                L.append(d)
+
+        if n > len(L):
+            n = len(L)
+        # Création d'un échantillon aléatoire de n dictionnaires de L
+        echantillon = random.sample(L, n)
+
+        return f"Notes et commentaires de n utilisateurs : {echantillon}"
+=======
     return f"Voici les notes et commentaires de n utilisateurs : {echantillon}"
 >>>>>>> acced5b474e0fc60e795b725ddbd283b340b0a69
+>>>>>>> 3c355fb49a80f44a6ba97161c6f5b258b4f5a5f1
