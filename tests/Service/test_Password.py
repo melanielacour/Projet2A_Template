@@ -21,7 +21,7 @@ class MockUserRepo:
         else:
             return None
 
-password_service = PasswordService()  # Instanciez PasswordService
+password_service = PasswordService()  
 user_repo = MockUserRepo()
 
 def test_hash_password():
