@@ -1,116 +1,86 @@
-from typing import List
+from src.dao.user_dao import UserDao
+from src.Service.PasswordService import PasswordService
 
 
 class UserService:
-
-    def __init__(self, user_dao, film_dao, review_dao):
+    def __init__(self, user_dao: UserDao, password_service: PasswordService):
         """
-        Initialise le service avec les objets DAO (UserDAO, FilmDAO, ReviewDAO)
-        pour interagir avec les données des utilisateurs, des films et des critiques.
-        
+        Initialise le service avec un UserDAO pour gérer les données des utilisateurs
+        et un PasswordService pour valider les mots de passe.
+
         Paramètres:
         -----------
-        user_dao : UserDAO
-            Objet pour interagir avec les données des utilisateurs.
-        film_dao : FilmDAO
-            Objet pour interagir avec les données des films.
-        review_dao : ReviewDAO
-            Objet pour interagir avec les critiques des films.
+        user_dao : UserDao
+            DAO pour interagir avec les données des utilisateurs dans la base de données.
+        password_service : PasswordService
+            Service utilisé pour valider les mots de passe.
         """
         self.user_dao = user_dao
-        self.film_dao = film_dao
-        self.review_dao = review_dao
+        self.password_service = password_service
 
-    def log_in(self, username: str, password: str) -> None:
+    def register_user(self, pseudo: str, password: str, is_scout: bool = False) -> bool:
         """
-        Permet à un utilisateur de se connecter avec un nom d'utilisateur et un mot de passe.
+        Inscrit un nouvel utilisateur avec un identifiant unique et un mot de passe sécurisé.
         
         Paramètres:
         -----------
-        username : str
-            Le nom d'utilisateur de l'utilisateur.
+        pseudo : str
+            Le pseudo de l'utilisateur.
         password : str
             Le mot de passe de l'utilisateur.
+        is_scout : bool, optional
+            Indique si l'utilisateur est un éclaireur (scout). Par défaut, False.
         
         Retourne:
         ---------
-        None
+        bool
+            True si l'utilisateur est inscrit avec succès, sinon False.
         
         Lève:
         -----
         ValueError:
-            Si les identifiants sont incorrects ou que l'utilisateur n'existe pas.
+            Si l'identifiant est déjà utilisé ou si le mot de passe ne respecte pas les règles.
         """
-        user = self.user_dao.get_user_by_username(username)
-    
-        # Si l'utilisateur n'existe pas ou si le mot de passe ne correspond pas
-        if not user or not self.user_dao.verify_password(user, password):
-            raise ValueError("Nom d'utilisateur ou mot de passe incorrect")
-            
+        # Vérifier si l'utilisateur existe déjà
+        if self.user_dao.get_user_by_pseudo(pseudo):
+            raise ValueError("Cet identifiant est déjà utilisé.")
 
-    def get_scouts(self, user_id: int) -> List['Scout']:
+        # Valider le mot de passe
+        if not self.password_service.validate_password(password):
+            raise ValueError("Le mot de passe doit comporter au moins une majuscule, une minuscule et un chiffre.")
+
+        # Créer le nouvel utilisateur dans la base de données
+        return self.user_dao.create_user(pseudo=pseudo, is_scout=is_scout, pswd=password)
+
+    def log_in(self, pseudo: str, password: str) -> bool:
         """
-        Récupère la liste des éclaireurs (scouts) d'un utilisateur.
+        Permet à un utilisateur de se connecter en vérifiant le pseudo et le mot de passe.
+
+        Paramètres:
+        -----------
+        pseudo : str
+            L'identifiant de l'utilisateur.
+        password : str
+            Le mot de passe de l'utilisateur.
+
+        Retourne:
+        ---------
+        bool
+            True si la connexion est réussie, sinon False.
+
+        Lève:
+        -----
+        ValueError:
+            Si le pseudo ou le mot de passe est incorrect.
+        """
+        # Récupérer l'utilisateur par son pseudo
+        user = self.user_dao.get_user_by_pseudo(pseudo)
+
+        # Vérifier si l'utilisateur existe et si le mot de passe correspond
+        if not user:
+            raise ValueError("Identifiant incorrect.")
         
-        Paramètres:
-        -----------
-        user_id : int
-            L'identifiant de l'utilisateur.
+        if user.pswd != password:
+            raise ValueError("Mot de passe incorrect.")
 
-        Retourne:
-        ---------
-        List[Scout]
-            Liste des éclaireurs de l'utilisateur.
-        """
-        return self.user_dao.get_scouts(user_id)
-
-    def get_seen_films(self, user_id: int) -> List['Film']:
-        """
-        Récupère la liste des films déjà vus par l'utilisateur.
-
-        Paramètres:
-        -----------
-        user_id : int
-            L'identifiant de l'utilisateur.
-
-        Retourne:
-        ---------
-        List[Film]
-            Liste des films vus par l'utilisateur.
-        """
-        return self.film_dao.get_seen_films(user_id)
-
-    def get_to_watch_films(self, user_id: int) -> List['Film']:
-        """
-        Récupère la liste des films que l'utilisateur souhaite voir.
-
-        Paramètres:
-        -----------
-        user_id : int
-            L'identifiant de l'utilisateur.
-
-        Retourne:
-        ---------
-        List[Film]
-            Liste des films que l'utilisateur veut voir.
-        """
-        return self.film_dao.get_to_watch_films(user_id)
-
-    def get_review(self, id_film: int, n: int) -> List['Review']:
-        """
-        Récupère les critiques d’un film.
-
-        Paramètres:
-        -----------
-        id_film : int
-            L'identifiant du film dont on souhaite récupérer les critiques.
-        n : int
-            Le nombre maximum de critiques à récupérer.
-
-        Retourne:
-        ---------
-        List[Review]
-            Liste des critiques du film.
-        """
-        return self.review_dao.get_reviews(id_film, n)
-
+        return True

@@ -7,57 +7,59 @@ from src.dao.UserRepo import UserRepo
 from src.Model.User import User
 
 
-def hash_password(password: str, salt: Optional[str] = None) -> str:
-    """
-    Hache le mot de passe avec un sel optionnel en utilisant SHA-256.
-    Si aucun sel n'est fourni, un nouveau sel est créé.
-    """
-    if salt is None:
-        salt = create_salt()
-    hashed_password = hashlib.sha256((salt + password).encode()).hexdigest()
-    return f"{salt}${hashed_password}"
+class PasswordService:
+    def __init__(self):
+        pass
 
-def create_salt() -> str:
-    """
-    Génère un sel aléatoire sécurisé sur le plan cryptographique.
-    """
-    return secrets.token_hex(128)
+    def hash_password(self, password: str, salt: Optional[str] = None) -> str:
+        """
+        Hache le mot de passe avec un sel optionnel en utilisant SHA-256.
+        Si aucun sel n'est fourni, un nouveau sel est créé.
+        """
+        if salt is None:
+            salt = self.create_salt()  # Appel à la méthode d'instance create_salt
+        hashed_password = hashlib.sha256((salt + password).encode()).hexdigest()
+        return f"{salt}${hashed_password}"
 
-def check_password_strength(password: str):
-    """
-    Vérifie la force du mot de passe.
-    Lève une exception si le mot de passe ne respecte pas les critères.
-    """
-    if len(password) < 8:
-        raise ValueError("Password length must be at least 8 characters")
-    if not re.match(r'^[a-zA-Z0-9]+$', password):  # Vérifie l'absence de caractères spéciaux
-        raise ValueError("Password must contain only letters and digits (no special characters)")
-    if not any(c.islower() for c in password):
-        raise ValueError("Password must contain at least one lowercase letter")
-    if not any(c.isupper() for c in password):
-        raise ValueError("Password must contain at least one uppercase letter")
-    if not any(c.isdigit() for c in password):
-        raise ValueError("Password must contain at least one digit")
+    def create_salt(self) -> str:
+        """
+        Génère un sel aléatoire sécurisé sur le plan cryptographique.
+        """
+        return secrets.token_hex(128)
 
-def validate_pseudo_password(pseudo: str, password: str, user_repo: UserRepo) -> User:
-    """
-    Valide le nom d'utilisateur et le mot de passe.
-    Lève une exception si la validation échoue.
-    """
+    def check_password_strength(self, password: str):
+        """
+        Vérifie la force du mot de passe.
+        Lève une exception si le mot de passe ne respecte pas les critères.
+        """
+        if len(password) < 8:
+            raise ValueError("Password length must be at least 8 characters")
+        if not re.match(r'^[a-zA-Z0-9]+$', password):  # Vérifie l'absence de caractères spéciaux
+            raise ValueError("Password must contain only letters and digits (no special characters)")
+        if not any(c.islower() for c in password):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not any(c.isupper() for c in password):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not any(c.isdigit() for c in password):
+            raise ValueError("Password must contain at least one digit")
 
-    user_with_pseudo: Optional[User] = user_repo.get_by_pseudo(pseudo=pseudo)
+    def validate_pseudo_password(self, pseudo: str, password: str, user_repo: UserRepo) -> User:
+        """
+        Valide le nom d'utilisateur et le mot de passe.
+        Lève une exception si la validation échoue.
+        """
+        user_with_pseudo: Optional[User] = user_repo.get_by_pseudo(pseudo=pseudo)
 
-    if not user_with_pseudo:
-        raise Exception(f"User with pseudo {pseudo} not found")
+        if not user_with_pseudo:
+            raise Exception(f"User with pseudo {pseudo} not found")
 
-    # Vérifie la force du mot de passe (longueur et contenu)
-    check_password_strength(password)  # Vérifiez d'abord la force du mot de passe
+        self.check_password_strength(password)  # Appel à la méthode d'instance check_password_strength
 
-    salt_stored = user_with_pseudo.password[:256]  # Longueur du sel (256 hex characters = 128 bytes)
-    hashed_password_stored = user_with_pseudo.password[256:]
-    hashed_password = hash_password(password, salt_stored)[256:]
+        salt_stored = user_with_pseudo.password[:256]
+        hashed_password_stored = user_with_pseudo.password[256:]
+        hashed_password = self.hash_password(password, salt_stored)[256:]  # Appel à la méthode d'instance hash_password
 
-    if hashed_password != hashed_password_stored:
-        raise Exception("Incorrect password")
+        if hashed_password != hashed_password_stored:
+            raise Exception("Incorrect password")
 
-    return user_with_pseudo
+        return user_with_pseudo
