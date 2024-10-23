@@ -45,7 +45,7 @@ class ReviewDao(metaclass=Singleton):
                 id_review=row["id_review"],
                 id_film=row["id_film"],
                 id_user=row["id_user"],
-                review=row["review"]
+                comment=row["comment"]
                 )
             liste_review.append(review1)
             return liste_review
@@ -60,7 +60,29 @@ class ReviewDao(metaclass=Singleton):
         review_text : str
             Le texte de la critique à ajouter.
         """
-        Review.reviews[(self.id_user, self.id_film)] = review_text
+        with DBConnection().connection as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO projet_2a.users (pseudo, is_scout, password) "
+                    "VALUES (%(pseudo)s, %(is_scout)s, %(pswd)s)              "
+                    "RETURNING id;                                            ",
+                    {
+                        "pseudo": pseudo,
+                        "is_scout": is_scout,
+                        "pswd": pswd
+                    },
+                )
+                res1 = cursor.fetchone()
+
+        if res1:
+            user1 = UserSimple(
+                id_user=res1["id"],
+                pseudo=pseudo,
+                is_scout=is_scout,
+                pswd=pswd
+            )
+            return True
+        return False
 
     def delete_review(self):
         """
