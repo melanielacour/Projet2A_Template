@@ -1,9 +1,11 @@
+import random
 from unittest.mock import Mock
 
 import pytest
 
 from src.Model.User import User
-from src.Service.UserService import UserService
+from src.Service.UserService import (UserService, average_rate,
+                                     get_review_by_title)
 
 
 def test_register_user_success():
@@ -129,3 +131,61 @@ def test_log_in_invalid_password():
     mock_user_dao.get_user_by_pseudo.assert_called_once_with("existing_user")
     mock_password_service.validate_password.assert_called_once_with("WrongPassword123", "ValidPassword123")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Simulation de la classe ReviewDao
+class MockReviewDao:
+    @staticmethod
+    def get_all_review_by_title(title):
+        if title == "Film A":
+            return [
+                {'id_user': 1, 'note': 8.0, 'comment': 'Super film!'},
+                {'id_user': 2, 'note': 7.5, 'comment': 'Bien mais pas incroyable.'},
+                {'id_user': 3, 'note': 9.0, 'comment': 'Un chef-d\'œuvre!'},
+                {'id_user': 4, 'note': 6.0, 'comment': 'Moyen.'},
+                {'id_user': 5, 'note': 7.0, 'comment': 'Pas mal.'},  # Utilisateur avec une note valide
+                {'id_user': 6, 'note': 7.0, 'comment': 'Assez bon!'},  # Commentaire valide
+            ]
+        elif title == "Film B":
+            return [
+                {'id_user': 7, 'note': 5.5, 'comment': 'Pas terrible.'},
+                {'id_user': 8, 'note': 6.5, 'comment': 'Assez bon.'},
+                {'id_user': 9, 'note': 8.5, 'comment': 'J\'adore ce film!'},
+            ]
+        return []
+
+
+def test_average_rate():
+    # Test de la fonction average_rate
+    assert average_rate("Film A") == "La note moyenne de 'Film A' est de 7.42."
+    assert average_rate("Film B") == "La note moyenne de 'Film B' est de 6.83."
+    assert average_rate("Film C") == "Aucune note disponible pour le film 'Film C'."
+    print("Tous les tests de average_rate sont passés.")
+
+
+def test_get_review_by_title():
+    # Test de la fonction get_review_by_title
+    result = get_review_by_title("Film A", 3)
+    assert "Voici les notes et commentaires de" in result
+    assert len(result.split(':')[1].strip(' "')) <= 3  # Vérifie que le nombre d'avis ne dépasse pas 3
+
+    result_b = get_review_by_title("Film B", 2)
+    assert "Voici les notes et commentaires de" in result_b
+    assert len(result_b.split(':')[1].strip(' "')) <= 2  # Vérifie que le nombre d'avis ne dépasse pas 2
+
+    result_c = get_review_by_title("Film C", 5)
+    assert "Voici les notes et commentaires de" in result_c
+    assert "0 utilisateurs" in result_c  # Vérifie que l'on reçoit 0 utilisateurs pour Film C
+
+    print("Tous les tests de get_review_by_title sont passés.")
