@@ -84,7 +84,7 @@ class UserDao(metaclass=Singleton):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO projet_2a.users (pseudo, is_scout, password) "
+                    "INSERT INTO projet_2a.users (pseudo, is_scout, pswd) "
                     "VALUES (%(pseudo)s, %(is_scout)s, %(pswd)s)              "
                     "RETURNING id;                                            ",
                     {
