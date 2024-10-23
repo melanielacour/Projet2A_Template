@@ -10,7 +10,7 @@ class ReviewDao(metaclass=Singleton):
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT id_review,id_user,id_film,comment FROM projet_2a.review          "
-                    "WHERE id_film = %(id_film)s;            ",
+                    "WHERE id = %(id_film)s;            ",
                     {"id_film": id_film}
                 )
                 res = cursor.fetchall()
@@ -22,7 +22,8 @@ class ReviewDao(metaclass=Singleton):
                 id_review=row["id_review"],
                 id_film=row["id_film"],
                 id_user=row["id_user"],
-                comment=row["comment"]
+                comment=row["comment"],
+                note=row["rating"]
                 )
             liste_review.append(review1)
 
@@ -45,13 +46,14 @@ class ReviewDao(metaclass=Singleton):
                 id_review=row["id_review"],
                 id_film=row["id_film"],
                 id_user=row["id_user"],
-                comment=row["comment"]
+                comment=row["comment"],
+                note= row["rating"]
                 )
             liste_review.append(review1)
             return liste_review
 
 
-    def add_review(self, review_text: str):
+    def add_comment(self,review: Review):
         """
         Ajoute une critique au dictionnaire des critiques.
 
@@ -60,16 +62,21 @@ class ReviewDao(metaclass=Singleton):
         review_text : str
             Le texte de la critique à ajouter.
         """
+        id_user= review.id_user
+        id_film= review.id_film
+        comment= review.comment
+        note= review.note
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO projet_2a.users (pseudo, is_scout, password) "
-                    "VALUES (%(pseudo)s, %(is_scout)s, %(pswd)s)              "
-                    "RETURNING id;                                            ",
+                    "INSERT INTO projet_2a.review(id_film, id_user, rating, comment) "
+                    "VALUES (%(id_user)s, %(id_film)s, %(comment)s, %(note)s)              "
+                    "RETURNING id_re;                                            ",
                     {
-                        "pseudo": pseudo,
-                        "is_scout": is_scout,
-                        "pswd": pswd
+                        "id_user": id_user,
+                        "id_film": id_film,
+                        "comment": comment
+                        "note": note
                     },
                 )
                 res1 = cursor.fetchone()
