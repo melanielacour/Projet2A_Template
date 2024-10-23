@@ -2,13 +2,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.Model.User import \
-    User  # Assurez-vous d'importer votre modèle d'utilisateur
+from src.Model.User import User
 from src.Service.UserService import UserService
 
 
 def test_register_user_success():
-    # Arrange
+  
     mock_user_dao = Mock()
     mock_password_service = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=mock_password_service)
@@ -17,10 +16,8 @@ def test_register_user_success():
     mock_password_service.validate_password.return_value = True  # Le mot de passe est valide
     mock_user_dao.create_user.return_value = True  # Simulation de la création réussie de l'utilisateur
 
-    # Act
     result = user_service.register_user(pseudo="new_user", password="ValidPassword123", is_scout=False)
 
-    # Assert
     assert result == True
     mock_user_dao.get_user_by_pseudo.assert_called_once_with("new_user")
     mock_password_service.validate_password.assert_called_once_with("ValidPassword123")
@@ -28,13 +25,12 @@ def test_register_user_success():
 
 
 def test_register_user_existing_pseudo():
-    # Arrange
+
     mock_user_dao = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=Mock())
 
     mock_user_dao.get_user_by_pseudo.return_value = User(id_user=1, pseudo="existing_user", is_scout=False, pswd="password")
     
-    # Act & Assert
     with pytest.raises(ValueError, match="Cet identifiant est déjà utilisé."):
         user_service.register_user(pseudo="existing_user", password="Password123", is_scout=False)
     
@@ -42,7 +38,7 @@ def test_register_user_existing_pseudo():
 
 
 def test_register_user_invalid_password():
-    # Arrange
+
     mock_user_dao = Mock()
     mock_password_service = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=mock_password_service)
@@ -50,7 +46,7 @@ def test_register_user_invalid_password():
     mock_user_dao.get_user_by_pseudo.return_value = None  # L'utilisateur n'existe pas
     mock_password_service.validate_password.return_value = False  # Mot de passe non valide
 
-    # Act & Assert
+
     with pytest.raises(ValueError, match="Le mot de passe doit comporter au moins une majuscule, une minuscule et un chiffre."):
         user_service.register_user(pseudo="new_user", password="invalidpassword", is_scout=False)
 
@@ -58,29 +54,26 @@ def test_register_user_invalid_password():
 
 
 def test_log_in_success():
-    # Arrange
+
     mock_user_dao = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=Mock())
 
     user = User(id_user=1, pseudo="existing_user", is_scout=False, pswd="ValidPassword123")
     mock_user_dao.get_user_by_pseudo.return_value = user  # L'utilisateur existe
 
-    # Act
+ 
     result = user_service.log_in(pseudo="existing_user", password="ValidPassword123")
 
-    # Assert
     assert result == True
     mock_user_dao.get_user_by_pseudo.assert_called_once_with("existing_user")
 
 
 def test_log_in_invalid_pseudo():
-    # Arrange
     mock_user_dao = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=Mock())
 
     mock_user_dao.get_user_by_pseudo.return_value = None  # L'utilisateur n'existe pas
 
-    # Act & Assert
     with pytest.raises(ValueError, match="Identifiant incorrect."):
         user_service.log_in(pseudo="nonexistent_user", password="ValidPassword123")
 
@@ -88,14 +81,12 @@ def test_log_in_invalid_pseudo():
 
 
 def test_log_in_invalid_password():
-    # Arrange
     mock_user_dao = Mock()
     user_service = UserService(user_dao=mock_user_dao, password_service=Mock())
 
     user = User(id_user=1, pseudo="existing_user", is_scout=False, pswd="ValidPassword123")
     mock_user_dao.get_user_by_pseudo.return_value = user  # L'utilisateur existe
 
-    # Act & Assert
     with pytest.raises(ValueError, match="Mot de passe incorrect."):
         user_service.log_in(pseudo="existing_user", password="WrongPassword123")
 
