@@ -21,6 +21,8 @@ def add_review(self,id_user,id_film,comment=None,note):
 
         bool
         """
+    if not 1<=note<=10:
+        raise ValueError("La note n'est pas comprise entre 1 et 10")
     review=Review(id_review=None, id_film=id_film,id_user=id_user, comment=comment,note=note)
     existing_comments = self.review_dao.get_review_by_id_user_and_id_film(id_user, id_film)
 
@@ -100,6 +102,8 @@ def modify_review(self,id_user,id_film, comment_modif, note_modif):
 
         bool
     """
+    if not 1<=note_modif<=10:
+        raise ValueError("La note n'est pas comprise entre 1 et 10")
     review=Review(id_review=None, id_film=id_film,id_user=id_user, comment=comment_modif,note=note)
     existing_comments = self.review_dao.get_review_by_id_user_and_id_film(id_user, id_film)
 
@@ -158,6 +162,9 @@ def modify_note(self,id_user,id_film, comment_note):
 
         bool
     """
+    if not 1<=note<=10:
+        raise ValueError("La note n'est pas comprise entre 1 et 10")
+
     review=Review(id_review=None, id_film=id_film,id_user=id_user, comment=comment,note=note_modif)
     existing_comments = self.review_dao.get_review_by_id_user_and_id_film(id_user, id_film)
 
