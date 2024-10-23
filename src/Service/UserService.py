@@ -20,6 +20,7 @@ class UserService:
         is_scout : bool, optional
             Indique si l'utilisateur est un éclaireur (scout). Par défaut, False.
 
+
         Retourne:
         ---------
         str

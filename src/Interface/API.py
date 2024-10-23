@@ -41,7 +41,7 @@ class Film(BaseModel):
     ratings: list[int] = []
 
 
-@app.get("/movies/title/{title}", response_model=Film, tags = "FILMS")
+@app.get("/movies/title/{title}", response_model=Film, tags=["Films"])
 async def get_movie_by_title(title: str):
     film = service.get_movie_by_title(title)
     if not film:
@@ -49,7 +49,7 @@ async def get_movie_by_title(title: str):
     return film
 
 
-@app.get("/movies/category/{category_name}", response_model=list[Film])
+@app.get("/movies/category/{category_name}", response_model=list[Film], tags=["Films"])
 async def get_movies_by_category(category_name: str):
     category_id = service.get_category_id(category_name)
     if category_id is None:
@@ -59,7 +59,7 @@ async def get_movies_by_category(category_name: str):
     return films
 
 
-@app.get("/movies/director/{director_name}", response_model=list[Film])
+@app.get("/movies/director/{director_name}", response_model=list[Film], tags=["Films"])
 async def get_movies_by_director(director_name: str):
     films = service.get_movies_by_director_name(director_name)
     if not films:
@@ -79,11 +79,11 @@ class UserRegistration(BaseModel):
     password: str
     is_scout: bool = False
 
-@app.post("/register")
+@app.post("/register", tags=["User"])
 def register_user(pseudo: str, password: str, is_scout: bool = False):
     return user_service.register_user(pseudo, password, is_scout)
 
-@app.post("/login")
+@app.post("/login", tags=["User"])
 def log_in(pseudo: str, password: str):
     return user_service.log_in(pseudo, password)
 
@@ -101,7 +101,7 @@ class Review(BaseModel):
     id_user: int
     comment: str
 
-@app.get("/reviews/{title}", response_model=List[Review])
+@app.get("/reviews/{title}", response_model=List[Review], tags=["Review"])
 def get_reviews_by_title(title: str):
     """
     Récupère toutes les critiques pour un film donné par son titre.

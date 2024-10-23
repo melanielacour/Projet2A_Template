@@ -60,8 +60,11 @@ def delete_comment(self,id_user,id_film):
     # Si aucun commentaire existe lève une erreur, sinon supprime le commentaire grâce à la DAO
     if not existing_comments:
         return False
-    result = self.review_dao.delete_comment(review)
+    result = self.review_dao.delete_review(review)
     return result
+    review=Review(id_review=None, id_film=id_film,id_user=id_user, comment=None,note=note)
+    return result
+
 
 def delete_review(self,id_user,id_film):
     """
@@ -193,3 +196,5 @@ def modify_note(self,id_user,id_film, comment_note):
     return result
     result = self.review_dao.add_review(review)
     return result
+
+# get_all_review_by_id à faire
