@@ -63,3 +63,7 @@ class PasswordService:
             raise Exception("Incorrect password")
 
         return user_with_pseudo
+
+    def validate_password(self, input_password: str, stored_password: str) -> bool:
+        # Par exemple, si les mots de passe sont stockés sous forme de hachage, vous devrez les comparer après hachage
+        return input_password == stored_password  # Remplacez par votre logique de validation
