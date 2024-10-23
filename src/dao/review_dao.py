@@ -33,9 +33,9 @@ class ReviewDao(metaclass=Singleton):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM projet_2a.film                                  "
+                    "SELECT * FROM projet_2a.film                                 "
                     "JOIN projet_2a.review ON review.id_film = film.id            "
-                    "WHERE film.title = %(title)s;                                 ",
+                    "WHERE film.title = %(title)s;                                ",
                     {"title": title}
                 )
             res = cursor.fetchall()
@@ -71,7 +71,7 @@ class ReviewDao(metaclass=Singleton):
                 cursor.execute(
                     "INSERT INTO projet_2a.review(id_film, id_user, rating, comment) "
                     "VALUES (%(id_user)s, %(id_film)s, %(comment)s, %(note)s)              "
-                    "RETURNING id_re;                                            ",
+                    "RETURNING id_review;                                            ",
                     {
                         "id_user": id_user,
                         "id_film": id_film,
@@ -82,16 +82,17 @@ class ReviewDao(metaclass=Singleton):
                 res1 = cursor.fetchone()
 
         if res1:
-            user1 = UserSimple(
-                id_user=res1["id"],
-                pseudo=pseudo,
-                is_scout=is_scout,
-                pswd=pswd
+            rev = Review(
+                id_review=res1["id_review"],
+                id_user=id_user,
+                id_film=id_film,
+                comment=comment,
+                note=note
             )
-            return True
+            return rev
         return False
 
-    def delete_review(self):
+    def delete_review(self, review):
         """
         Supprime la critique du dictionnaire des critiques.
         """

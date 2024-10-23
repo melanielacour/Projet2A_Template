@@ -28,7 +28,7 @@ class UserDao(metaclass=Singleton):
                 id_user=row["id"],
                 pseudo=row["pseudo"],
                 is_scout=row["is_scout"],
-                pswd=row["password"],
+                pswd=row["pswd"],
             )
             liste_user.append(user1)
         return {"users": liste_user}
@@ -49,7 +49,7 @@ class UserDao(metaclass=Singleton):
                 id_user=res["id"],
                 pseudo=res["pseudo"],
                 is_scout=res["is_scout"],
-                pswd=res["passwords"],
+                pswd=res["pswd"],
             )
             return user1
         return None
@@ -69,7 +69,7 @@ class UserDao(metaclass=Singleton):
                 id_user=res["id"],
                 pseudo=res["pseudo"],
                 is_scout=res["is_scout"],
-                pswd=res["password"],
+                pswd=res["pswd"],
             )
             return user1
         return None
