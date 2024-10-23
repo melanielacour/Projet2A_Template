@@ -3,6 +3,7 @@ import re
 import secrets
 from typing import Optional
 
+from src.dao.user_dao import UserDao
 from src.dao.UserRepo import UserRepo
 from src.Model.User import User
 
@@ -31,7 +32,7 @@ class PasswordService:
             Le sel qu'on va utiliser pour le hachage.
 
         """
-        # Si aucun sel n'est fourni, un nouveau sel est généré. 
+        # Si aucun sel n'est fourni, un nouveau sel est généré.
         # Cela garantit que même si deux utilisateurs ont le même mot de passe, leurs hachages seront différents grâce à des sels uniques.
         if salt is None:
             salt = self.create_salt()
@@ -51,18 +52,18 @@ class PasswordService:
         """
         Cette méthode vérifie que le mot de passe respecte les critères tels que la longueur, la présence de lettres majuscules et minuscules, et de chiffres.
         Lève une exception si le mot de passe ne respecte pas les critères.
-        
+
         Paramètres:
         -----------
         password : str
             Le mot de passe de l'utilisateur
-        
+
         """
-        # on verifie que le mot de passe a une longueur inférieur à 8 caractères. 
+        # on verifie que le mot de passe a une longueur inférieur à 8 caractères.
         if len(password) < 8:
             raise ValueError("Password length must be at least 8 characters")
         # on verifie que le mot de passe ne contient que des lettres et des chiffres, minuscules et chiffres
-        if not re.match(r'^[a-zA-Z0-9]+$', password):  
+        if not re.match(r'^[a-zA-Z0-9]+$', password):
             raise ValueError("Password must contain only letters and digits (no special characters)")
         if not any(c.islower() for c in password):
             raise ValueError("Password must contain at least one lowercase letter")
@@ -75,7 +76,7 @@ class PasswordService:
 
 
 
-    def validate_pseudo_password(self, pseudo: str, password: str, user_repo: UserRepo) -> User:
+    def validate_pseudo_password(self, pseudo: str, password: str) -> User:
         """
         Cette méthode valide un pseudo et un mot de passe en vérifiant que l'utilisateur existe et que le mot de passe fourni est correct.
         Si ce n'est pas le cas, on lève une exception si la validation échoue.
@@ -85,7 +86,7 @@ class PasswordService:
         pseudo : str
             Le pseudo de l'utilisateur
         password : str
-            Le mot de passe de l'utilisateur 
+            Le mot de passe de l'utilisateur
         user_repo : UserRepo
             Le dépôt d'utilisateurs utilisé pour récupérer les informations de l'utilisateur.
 
@@ -94,19 +95,19 @@ class PasswordService:
         User
             L'objet User correspondant au pseudo valide.
         """
-        
+
         # on récupère l'utilisateur correspondant au pseudo depuis le dépôt d'utilisateurs.
-        user_with_pseudo: Optional[User] = user_repo.get_by_pseudo(pseudo=pseudo)
+        user_with_pseudo= UserDao().get_user_by_pseudo(pseudo)
 
         # une exception est levée pour éviter que des utilisateurs non enregistrés ne puissent tenter de se connecter.
         if not user_with_pseudo:
             raise Exception(f"User with pseudo {pseudo} not found")
 
-        self.check_password_strength(password)  
+        self.check_password_strength(password)
 
-        salt_stored = user_with_pseudo.password[:256]
-        hashed_password_stored = user_with_pseudo.password[256:]
-        hashed_password = self.hash_password(password, salt_stored)[256:]  
+        salt_stored = user_with_pseudo.pswd[:256]
+        hashed_password_stored = user_with_pseudo.pswd[256:]
+        hashed_password = self.hash_password(password, salt_stored)[256:]
 
         if hashed_password != hashed_password_stored:
             raise Exception("Incorrect password")
@@ -117,9 +118,9 @@ class PasswordService:
 
     def validate_password(self, input_password: str, stored_password: str) -> bool:
         """
-        Cette méthode valide le mot de passe en le comparant avec le mot de passe stocké 
+        Cette méthode valide le mot de passe en le comparant avec le mot de passe stocké
         Elle retourne True si les mots de passe correspondent, sinon False.
-    
+
         Paramètres:
         -----------
         input_password : str

@@ -16,9 +16,8 @@ import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.dao.review_dao import ReviewDao
 from src.dao.user_dao import UserDao
-from src.Model.Review import Review
+# from src.Model.Review import Review
 from src.Service.MovieService import MovieService
 from src.Service.PasswordService import PasswordService
 from src.Service.UserService import UserService
@@ -42,7 +41,7 @@ class Film(BaseModel):
     ratings: list[int] = []
 
 
-@app.get("/movies/title/{title}", response_model=Film)
+@app.get("/movies/title/{title}", response_model=Film, tags = "FILMS")
 async def get_movie_by_title(title: str):
     film = service.get_movie_by_title(title)
     if not film:
