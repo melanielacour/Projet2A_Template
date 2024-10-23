@@ -75,7 +75,7 @@ class ReviewDao(metaclass=Singleton):
                     {
                         "id_user": id_user,
                         "id_film": id_film,
-                        "comment": comment
+                        "comment": comment,
                         "note": note
                     },
                 )
