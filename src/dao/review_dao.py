@@ -33,9 +33,9 @@ class ReviewDao(metaclass=Singleton):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM projet_2a.film                                 "
-                    "JOIN projet_2a.review ON review.id_film = film.id            "
-                    "WHERE film.title = %(title)s;                                ",
+                    "SELECT * FROM projet_2a.film                       "
+                    "JOIN projet_2a.review ON review.id_film = film.id "
+                    "WHERE film.title = %(title)s;                     ",
                     {"title": title}
                 )
             res = cursor.fetchall()
@@ -47,11 +47,10 @@ class ReviewDao(metaclass=Singleton):
                 id_film=row["id_film"],
                 id_user=row["id_user"],
                 comment=row["comment"],
-                note= row["rating"]
+                note=row["rating"]
                 )
             liste_review.append(review1)
             return liste_review
-
 
     def add_comment(self, review: Review):
         """
@@ -91,7 +90,6 @@ class ReviewDao(metaclass=Singleton):
             )
             return rev
         return False
-
 
     def delete_review(self, review):
         """

@@ -1,3 +1,7 @@
+import random
+
+from src.dao.review_dao import ReviewDao
+
 
 def average_rate(title):
     """
@@ -13,7 +17,8 @@ def average_rate(title):
     moy : float
         moyenne du film.
     """
-    review_list = ReviewDao.get_all_review_by_title(title)
+    review_dao = ReviewDao()
+    review_list = review_dao.get_all_review_by_title(title)
     L = []
 
     for row in review_list:
@@ -55,7 +60,8 @@ def get_review_by_title(title, n=10):
     echantillon_complet : list[dict]
         liste de n dictionnaires avec comme clés id_user, comment et note.
     """
-    review_list = ReviewDao.get_all_review_by_title(title)
+    review_dao = ReviewDao()
+    review_list = review_dao.get_all_review_by_title(title)
     L = []
 
     for row in review_list:
@@ -74,4 +80,4 @@ def get_review_by_title(title, n=10):
     # Création d'un échantillon aléatoire de n dictionnaires de L
     echantillon = random.sample(L, n)
 
-    return f"Voici les notes et commentaires de n utilisateurs : {echantillon}"
+    return echantillon
