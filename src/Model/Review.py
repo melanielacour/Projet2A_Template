@@ -15,8 +15,10 @@ class Review:
 
     """
 
-    def __init__(self, id_film: int, id_user: int, id_review: int, comment: str):
+    def __init__(self, id_film: int, id_user: int, id_review: int, comment: str, note: int):
         self.id_film = id_film
         self.id_user = id_user
         self.id_review = id_review
         self.comment = comment
+        self.note= note
+
