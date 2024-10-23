@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from src.dao.review_dao import ReviewDao
-from src.Model.Review import Review
+from src.Model.review import Review
 
 @pytest.fixture
 def review_dao():
@@ -20,11 +20,12 @@ def test_get_all_review_by_id(mocker, review_dao):
     ]
 
     result = review_dao.get_all_review_by_id(101)
-    print(result)
 
     # Vérifier les résultats
+    assert len(result) == 2
     assert isinstance(result[0], Review)
-
+    assert result[0].id_review == 1
+    assert result[0].note == 5
 
 def test_get_all_review_by_title(mocker, review_dao):
     # Mock de DBConnection

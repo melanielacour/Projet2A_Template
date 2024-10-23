@@ -88,3 +88,7 @@ class UserService:
             raise ValueError("Mot de passe incorrect.")
         # On retourne True si l'authentification est réussie donc si le l'utilisateur est bien inscrit.
         return True
+<<<<<<< HEAD
+=======
+
+>>>>>>> 455843ac32d54422f97696732b59958562669d89
