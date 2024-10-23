@@ -41,7 +41,7 @@ class Film(BaseModel):
     ratings: list[int] = []
 
 
-@app.get("/movies/title/{title}", response_model=Film, tags = "FILMS")
+@app.get("/movies/title/{title}", response_model=Film, tags=["Films"])
 async def get_movie_by_title(title: str):
     film = service.get_movie_by_title(title)
     if not film:
