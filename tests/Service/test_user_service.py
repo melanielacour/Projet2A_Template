@@ -16,11 +16,11 @@ def test_register_user_success():
 
     mock_user_dao.get_user_by_pseudo.return_value = None  # L'utilisateur n'existe pas encore
     mock_password_service.validate_password.return_value = True  # Le mot de passe est valide
-    mock_user_dao.create_user.return_value = True  # Création réussie de l'utilisateur
+    mock_user_dao.create_user.return_value = True 
 
     result = user_service.register_user(pseudo="new_user", password="ValidPassword123", is_scout=False)
 
-    assert result == "Vous êtes bien inscrit !"  # Vérifiez le message de succès
+    assert result == "Vous êtes bien inscrit !"
     mock_user_dao.get_user_by_pseudo.assert_called_once_with("new_user")
     mock_password_service.validate_password.assert_called_once_with("ValidPassword123")
     mock_user_dao.create_user.assert_called_once_with(pseudo="new_user", is_scout=False, pswd="ValidPassword123")
@@ -74,11 +74,11 @@ def test_log_in_success():
     user = User(
         id_user=1,
         pseudo="existing_user",
-        password="ValidPassword123",  # Utilisez 'password'
+        password="ValidPassword123",  
         is_scout=False,
-        seen=[],  # Liste vide pour le test
-        to_watch=[],  # Liste vide pour le test
-        scouts_list=[]  # Liste vide pour le test
+        seen=[],  
+        to_watch=[],  
+        scouts_list=[]  
     )
     
     mock_user_dao.get_user_by_pseudo.return_value = user  
@@ -113,7 +113,7 @@ def test_log_in_invalid_password():
     user = User(
         id_user=1,
         pseudo="existing_user",
-        password="ValidPassword123",  # Assurez-vous que c'est 'password'
+        password="ValidPassword123",  
         is_scout=False,
         seen=[], 
         to_watch=[], 
@@ -121,8 +121,6 @@ def test_log_in_invalid_password():
     )
 
     mock_user_dao.get_user_by_pseudo.return_value = user
-
-    # Configurez le mock pour que validate_password retourne False pour le mot de passe incorrect
     mock_password_service.validate_password.return_value = False 
 
     with pytest.raises(ValueError, match="Mot de passe incorrect."):
