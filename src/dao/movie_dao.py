@@ -37,6 +37,7 @@ class MovieDAO(metaclass=Singleton):
                     )
                     return film
                 return None
+
     def get_local_movie_by_idtmdb(self, id_tmdb:int):
         """
         Récupère le nom du film à partir de son ID.
