@@ -1,31 +1,159 @@
-from typing import List, Optional
+import random
+from datetime import datetime
 
-from src.Model.Movie import Movie
+import requests
 
+from src.Model.Film import Film
+
+TMDB_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3YTM1YmQwMDE2Mzk5MDNmNWM4MzBlODhkZDg2ZWQzMCIsIm5iZiI6MTcyOTU4MTc0MS41Nzg2NTEsInN1YiI6IjY2ZTQ0NmI5OTAxM2ZlODcyMjI0MTc1MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UvX882tvk0XKaN5mrivSQzXfzzXEOAqSX_4nzSfscFY"
+TMDB_API_KEY = "7a35bd001639903f5c830e88dd86ed30"
 
 class MovieService:
-    movie_db: Optional[object]
-    tmdb_api_key: str = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3YTM1YmQwMDE2Mzk5MDNmNWM4MzBlODhkZDg2ZWQzMCIsIm5iZiI6MTcyNjgxOTk4Mi42NzA1NDQsInN1YiI6IjY2ZTQ0NmI5OTAxM2ZlODcyMjI0MTc1MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.mUjUWmMcf2k7lyf4V7sJTn3X8eDGgYSpYDrhKippftg"
+    def get_category_id(self, category_name: str):
+        categories = {
+            "action": 28,
+            "aventure": 12,
+            "animation": 16,
+            "comédie": 35,
+            "crime": 80,
+            "documentaire": 99,
+            "drame": 18,
+            "familial": 10751,
+            "fantastique": 14,
+            "horreur": 27,
+            "musique": 10402,
+            "mystère": 9648,
+            "romance": 10749,
+            "science-fiction": 878,
+            "téléfilm": 10770,
+            "thriller": 53,
+            "guerre": 10752,
+            "western": 37
+        }
+        return categories.get(category_name.lower())
 
-    def __init__(self, movie_db: Optional[object] = None):
-        self.movie_db = movie_db
-
-    def get_film_by_id(self, movie_id: int) -> Movie:
-        # Récupération d'un film par ID depuis TMDB
-        response = httpx.get(f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={self.tmdb_api_key}&language=en-US")
+    def get_random_movies(self):
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        films = []
+        url = "https://api.themoviedb.org/3/movie/popular?language=fr-FR&page=1"
+        response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
-            data = response.json()
-            return Movie(id=data['id'], original_title=data['original_title'], description=data['overview'])
+            results = response.json().get("results", [])
+            for movie in results:
+                film = Film(
+                    id_film=0,
+                    id_tmdb=movie["id"],
+                    title=movie["title"],
+                    producer="N/A",
+                    category="N/A",
+                    date=movie["release_date"] if movie["release_date"] else "Inconnue",
+                    average_rate=0.0,
+                    ratings=[]
+                )
+                films.append(film)
+            return films
         else:
-            raise Exception(f"Error retrieving movie: {response.status_code}")
+            raise Exception(f"Erreur lors de la récupération des films : {response.status_code} - {response.text}")
 
-    def get_all_films(self) -> List[Movie]:
-        # Récupère tous les films depuis TMDB
-        response = httpx.get(f"https://api.themoviedb.org/3/movie/popular?api_key={self.tmdb_api_key}&language=en-US&page=1")
+    def get_movie_by_title(self, title: str):
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        search_url = f"https://api.themoviedb.org/3/search/movie?query={title}&language=fr-FR&page=1"
+        search_response = requests.get(search_url, headers=headers)
+
+        if search_response.status_code == 200:
+            search_results = search_response.json()["results"]
+            if search_results:
+                film_data = search_results[0]
+                film_id = film_data["id"]
+
+                details_url = f"https://api.themoviedb.org/3/movie/{film_id}?language=fr-FR"
+                details_response = requests.get(details_url, headers=headers)
+
+                if details_response.status_code == 200:
+                    details_data = details_response.json()
+                    return Film(
+                        id_film=details_data["id"],
+                        id_tmdb=details_data["id"],
+                        title=details_data["title"],
+                        producer=details_data.get("production_companies", [{"name": "Inconnu"}])[0].get("name", "Inconnu"),
+                        category=details_data.get("genres", [{"name": "Inconnu"}])[0].get("name", "Inconnu"),
+                        date=details_data["release_date"][:4] if "release_date" in details_data else "Inconnue"
+                    )
+                else:
+                    raise Exception(f"Erreur lors de la récupération des détails : {details_response.status_code}")
+            else:
+                raise Exception("Aucun film trouvé.")
+        else:
+            raise Exception(f"Erreur lors de la recherche : {search_response.status_code}")
+
+    def get_movies_by_category(self, category_id: int):
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        url = f"https://api.themoviedb.org/3/discover/movie?with_genres={category_id}&language=fr-FR"
+        response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
-            movies = response.json().get('results', [])
-            return [Movie(id=movie['id'], original_title=movie['original_title'], description=movie['overview']) for movie in movies]
+            movies_data = response.json()["results"]
+            films = []
+
+            for movie in movies_data:
+                details_url = f"https://api.themoviedb.org/3/movie/{movie['id']}?language=fr-FR"
+                details_response = requests.get(details_url, headers=headers)
+
+                if details_response.status_code == 200:
+                    details_data = details_response.json()
+                    film = Film(
+                        id_film=details_data["id"],
+                        id_tmdb=details_data["id"],
+                        title=details_data["title"],
+                        producer=details_data.get("production_companies", [{"name": "Inconnu"}])[0]["name"],
+                        category=details_data.get("genres", [{"name": "Inconnu"}])[0]["name"],
+                        date=details_data["release_date"][:4] if "release_date" in details_data else "Inconnue"
+                    )
+                    films.append(film)
+            return films
         else:
-            raise Exception(f"Error retrieving movies: {response.status_code}")
+            raise Exception(f"Erreur lors de la récupération des films par catégorie : {response.status_code}")
+
+    def get_movies_by_director(self, director_id: int):
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        url = f"https://api.themoviedb.org/3/discover/movie?with_crew={director_id}&language=fr-FR"
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            movies_data = response.json().get("results", [])
+            films = []
+
+            for movie in movies_data:
+                details_url = f"https://api.themoviedb.org/3/movie/{movie['id']}?language=fr-FR"
+                details_response = requests.get(details_url, headers=headers)
+
+                if details_response.status_code == 200:
+                    details_data = details_response.json()
+                    film = Film(
+                        id_film=details_data["id"],
+                        id_tmdb=details_data["id"],
+                        title=details_data["title"],
+                        producer=details_data.get("production_companies", [{"name": "Inconnu"}])[0]["name"],
+                        category=details_data.get("genres", [{"name": "Inconnu"}])[0]["name"],
+                        date=details_data["release_date"][:4] if "release_date" in details_data else "Inconnue"
+                    )
+                    films.append(film)
+            return films
+        else:
+            raise Exception(f"Erreur lors de la récupération des films par réalisateur : {response.status_code} - {response.text}")
+
+    def get_movies_by_director_name(self, director_name: str):
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        search_url = f"https://api.themoviedb.org/3/search/person?query={director_name}&language=fr-FR"
+        search_response = requests.get(search_url, headers=headers)
+
+        if search_response.status_code == 200:
+            search_results = search_response.json()["results"]
+            if search_results:
+                director_id = search_results[0]["id"]
+                return self.get_movies_by_director(director_id)
+            else:
+                raise Exception("Aucun réalisateur trouvé.")
+        else:
+            raise Exception(f"Erreur lors de la recherche du réalisateur : {search_response.status_code}")
