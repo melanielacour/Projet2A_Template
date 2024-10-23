@@ -13,6 +13,8 @@ class Film:
         self.ratings = ratings
 
 
+
+
 def get_film_by_title(title: str):
     url = f"http://127.0.0.1:8000/movies/title/{title}"
     response = requests.get(url)
@@ -39,11 +41,4 @@ def get_film_by_title(title: str):
 # Exécution de la fonction pour le titre "Inception"
 
 film = get_film_by_title("Inception")
-if film:
-    print(f"Titre : {film.title}, Producteur : {film.producer}, Date : {film.date}, ID TMDB : {film.id_tmdb}, Moyenne des notes : {film.average_rate}")
-else:
-    print("Aucun film trouvé.")
-
-url = f"http://127.0.0.1:8000/movies/title/'Inception'"
-response = requests.get(url)
-print(response)
+print(f"Titre : {film.title}, Producteur : {film.producer}, Date : {film.date}, ID TMDB : {film.id_tmdb}, Moyenne des notes : {film.average_rate}")
