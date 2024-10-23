@@ -1,14 +1,32 @@
+import os
 import time
 from datetime import datetime
+from typing import List
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+HOST = os.getenv("HOST")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+DATABASE = os.getenv("DATABASE")
 
 import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from src.dao.review_dao import ReviewDao
+from src.dao.user_dao import UserDao
+from src.Model.Review import Review
 from src.Service.MovieService import MovieService
+from src.Service.PasswordService import PasswordService
+from src.Service.UserService import UserService
 
 app = FastAPI()
 service = MovieService()
+
+# ########################### Films ######################################
 
 # modèle Pydantic pour les films
 
@@ -22,11 +40,6 @@ class Film(BaseModel):
     date: str
     average_rate: float = 0.0
     ratings: list[int] = []
-
-
-@app.get("/movies", response_model=list[Film])
-async def get_movies():
-    return service.get_random_movies()
 
 
 @app.get("/movies/title/{title}", response_model=Film)
@@ -53,3 +66,48 @@ async def get_movies_by_director(director_name: str):
     if not films:
         raise HTTPException(status_code=404, detail="Aucun film trouvé pour ce réalisateur.")
     return films
+
+
+# ########################### User ###########################################
+
+user_dao = UserDao()
+password_service = PasswordService()
+user_service = UserService()
+
+
+class UserRegistration(BaseModel):
+    pseudo: str
+    password: str
+    is_scout: bool = False
+
+@app.post("/register")
+def register_user(pseudo: str, password: str, is_scout: bool = False):
+    return user_service.register_user(pseudo, password, is_scout)
+
+@app.post("/login")
+def log_in(pseudo: str, password: str):
+    return user_service.log_in(pseudo, password)
+
+
+# ########################### Reviews ########################################
+
+from src.dao.review_dao import ReviewDao
+from src.Model.Review import Review
+
+review_dao = ReviewDao()
+
+class Review(BaseModel):
+    id_review: int
+    id_film: int
+    id_user: int
+    comment: str
+
+@app.get("/reviews/{title}", response_model=List[Review])
+def get_reviews_by_title(title: str):
+    """
+    Récupère toutes les critiques pour un film donné par son titre.
+    """
+    reviews = review_dao.get_all_review_by_title(title)
+    if not reviews:
+        raise HTTPException(status_code=404, detail="Aucune critique trouvée pour ce film.")
+    return reviews

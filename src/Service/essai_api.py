@@ -13,6 +13,29 @@ class Film:
         self.ratings = ratings
 
 
+def get_random_movies(self):
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        films = []
+        url = "https://api.themoviedb.org/3/movie/popular?language=fr-FR&page=1"
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            results = response.json().get("results", [])
+            for movie in results:
+                film = Film(
+                    id_film=0,
+                    id_tmdb=movie["id"],
+                    title=movie["title"],
+                    producer="N/A",
+                    category="N/A",
+                    date=movie["release_date"] if movie["release_date"] else "Inconnue",
+                    average_rate=0.0,
+                    ratings=[]
+                )
+                films.append(film)
+            return films
+        else:
+            raise Exception(f"Erreur lors de la récupération des films : {response.status_code} - {response.text}")
 
 
 def get_film_by_title(title: str):
@@ -42,3 +65,6 @@ def get_film_by_title(title: str):
 
 film = get_film_by_title("Inception")
 print(f"Titre : {film.title}, Producteur : {film.producer}, Date : {film.date}, ID TMDB : {film.id_tmdb}, Moyenne des notes : {film.average_rate}")
+
+
+# ######################################################

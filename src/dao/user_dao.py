@@ -1,14 +1,10 @@
 import os
 import sys
 from typing import List
-from src.dao.db_connection import DBConnection
-from src.Model.user_simple import UserSimple
-from src.utils.singleton import Singleton
 
 from src.dao.db_connection import DBConnection
 from src.Model.user_simple import UserSimple
 from src.utils.singleton import Singleton
-
 
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -28,11 +24,11 @@ class UserDao(metaclass=Singleton):
                 id_user=row["id"],
                 pseudo=row["pseudo"],
                 is_scout=row["is_scout"],
-                pswd=row["password"],
+                pswd=row["pswd"],
             )
             liste_user.append(user1)
         return {"users": liste_user}
-    
+
     def get_user_by_id(self, id):
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
@@ -49,7 +45,7 @@ class UserDao(metaclass=Singleton):
                 id_user=res["id"],
                 pseudo=res["pseudo"],
                 is_scout=res["is_scout"],
-                pswd=res["passwords"],
+                pswd=res["pswd"],
             )
             return user1
         return None
@@ -69,7 +65,7 @@ class UserDao(metaclass=Singleton):
                 id_user=res["id"],
                 pseudo=res["pseudo"],
                 is_scout=res["is_scout"],
-                pswd=res["password"],
+                pswd=res["pswd"],
             )
             return user1
         return None
@@ -79,12 +75,12 @@ class UserDao(metaclass=Singleton):
         user1 = self.get_user_by_pseudo(pseudo)
         if user1:
             raise ValueError("Nom d'utilisateur non disponible")
-        
+
         # Si le pseudo est unique, création du nouvel utilisateur
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO projet_2a.users (pseudo, is_scout, password) "
+                    "INSERT INTO projet_2a.users (pseudo, is_scout, pswd)     "
                     "VALUES (%(pseudo)s, %(is_scout)s, %(pswd)s)              "
                     "RETURNING id;                                            ",
                     {
@@ -104,6 +100,3 @@ class UserDao(metaclass=Singleton):
             )
             return True
         return False
-
-
-

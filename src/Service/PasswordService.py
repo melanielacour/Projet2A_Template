@@ -42,6 +42,8 @@ class PasswordService:
             raise ValueError("Password must contain at least one uppercase letter")
         if not any(c.isdigit() for c in password):
             raise ValueError("Password must contain at least one digit")
+        else :
+            return password
 
     def validate_pseudo_password(self, pseudo: str, password: str, user_repo: UserRepo) -> User:
         """
