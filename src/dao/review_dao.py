@@ -53,7 +53,7 @@ class ReviewDao(metaclass=Singleton):
             return liste_review
 
 
-    def add_comment(self,review: Review):
+    def add_comment(self, review: Review):
         """
         Ajoute une critique au dictionnaire des critiques.
 
@@ -62,20 +62,20 @@ class ReviewDao(metaclass=Singleton):
         review_text : str
             Le texte de la critique à ajouter.
         """
-        id_user= review.id_user
-        id_film= review.id_film
-        comment= review.comment
-        note= review.note
+        id_user = review.id_user
+        id_film = review.id_film
+        comment = review.comment
+        note = review.note
         with DBConnection().connection as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
                     "INSERT INTO projet_2a.review(id_film, id_user, rating, comment) "
-                    "VALUES (%(id_user)s, %(id_film)s, %(comment)s, %(note)s)              "
-                    "RETURNING id_review;                                            ",
+                    "VALUES (%(id_user)s, %(id_film)s, %(note)s, %(comment)s) "
+                    "RETURNING id_review; ",
                     {
                         "id_user": id_user,
                         "id_film": id_film,
-                        "comment": comment
+                        "comment": comment,  # Correction ici
                         "note": note
                     },
                 )
@@ -91,6 +91,7 @@ class ReviewDao(metaclass=Singleton):
             )
             return rev
         return False
+
 
     def delete_review(self, review):
         """
