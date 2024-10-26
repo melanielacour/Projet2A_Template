@@ -1,5 +1,4 @@
 from src.dao.db_connection import DBConnection
-from src.Model.Movie import Movie
 from src.Model.Review import Review
 from src.utils.singleton import Singleton
 
