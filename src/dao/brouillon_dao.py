@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 import os
 
 # Charger les variables d'environnement
-load_dotenv()
+if __name__ == "__main__":
+    load_dotenv()
+    print(UserMovieDao(DBConnection()).get_movies_by_user(id_user=6, status="watched"))
 
 
 db_connection = DBConnection()

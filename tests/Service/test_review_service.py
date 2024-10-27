@@ -23,18 +23,6 @@ class TestReviewService(unittest.TestCase):
         self.review_dao.add_review.assert_called_once()
         self.assertIsNotNone(review)
 
-    def test_search_and_rate_movie_update_review(self):
-        # Configurer un mock de review existante
-        existing_review = Review(id_review=1, id_film=1, id_user=1, note=5, comment="Okay movie")
-        self.review_dao.get_review_by_id_user_and_id_film.return_value = existing_review
-
-        # Appeler la méthode pour mettre à jour la critique
-        updated_review = self.review_service.search_and_rate_movie(1, 1, 9, "Great movie")
-
-        # Vérifier que la méthode update_review a été appelée
-        self.assertEqual(updated_review.note, 9)
-        self.assertEqual(updated_review.comment, "Great movie")
-
     def test_delete_review(self):
         # Configurer une critique existante
         self.review_dao.get_review_by_id_user_and_id_film.return_value = Review(

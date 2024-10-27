@@ -16,7 +16,7 @@ import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.dao.user_dao import UserDao
+from src.dao.user_repo import UserRepo
 # from src.Model.Review import Review
 from src.Service.MovieService import MovieService
 from src.Service.PasswordService import PasswordService
