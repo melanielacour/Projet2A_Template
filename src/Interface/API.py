@@ -5,6 +5,9 @@ from typing import List
 
 from dotenv import load_dotenv
 
+from src.dao.db_connection import DBConnection
+from src.dao.user_repo import UserRepo
+
 load_dotenv()
 
 HOST = os.getenv("HOST")
@@ -66,10 +69,10 @@ async def get_movies_by_director(director_name: str):
         raise HTTPException(status_code=404, detail="Aucun film trouvé pour ce réalisateur.")
     return films
 
-
 # ########################### User ###########################################
 
-user_dao = UserDao()
+db_connection = DBConnection()
+user_dao = UserRepo(db_connection)
 password_service = PasswordService()
 user_service = UserService()
 
@@ -93,7 +96,7 @@ def log_in(pseudo: str, password: str):
 from src.dao.review_dao import ReviewDao
 from src.Model.Review import Review
 
-review_dao = ReviewDao()
+review_dao = ReviewDao(db_connection)
 
 class Review(BaseModel):
     id_review: int
