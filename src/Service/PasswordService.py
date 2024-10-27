@@ -3,8 +3,7 @@ import re
 import secrets
 from typing import Optional
 
-from src.dao.user_dao import UserDao
-from src.dao.UserRepo import UserRepo
+from src.dao.user_repo import UserRepo
 from src.Model.User import User
 
 

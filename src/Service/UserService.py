@@ -1,15 +1,19 @@
-import os
-
-from src.dao.user_dao import UserDao
+import os 
+from src.dao.user_repo import UserRepo
+from src.dao.db_connection import DBConnection
 from src.Service.JWTService import JwtService
 from src.Service.PasswordService import PasswordService
 
 
 class UserService:
+    def __init__(self):
+        self.user_repo = UserRepo(DBConnection())  # Initialisation avec UserRepo
+        self.password_service = PasswordService()  # Initialisation avec PasswordService
+        self.jwt_service = JwtService(os.environ["JWT_SECRET"], "HS256")  # Initialisation avec JwtService
+
     def register_user(self, pseudo: str, password: str, is_scout: bool = False) -> str:
         """
-        Cette méthode Initialise le service avec un UserDAO pour gérer les données des utilisateurs
-        et un PasswordService pour valider les mots de passe.
+        Cette méthode permet d'inscrire un nouvel utilisateur dans le système.
 
         Paramètres:
         -----------
@@ -19,7 +23,6 @@ class UserService:
             Le mot de passe de l'utilisateur.
         is_scout : bool, optional
             Indique si l'utilisateur est un éclaireur (scout). Par défaut, False.
-
 
         Retourne:
         ---------
@@ -33,39 +36,29 @@ class UserService:
         """
 
         # Vérifier si l'utilisateur existe déjà
-        if UserDao().get_user_by_pseudo(pseudo):
+        if self.user_repo.get_by_username(pseudo):
             raise ValueError("Cet identifiant est déjà utilisé.")
 
         # Valider la force du mot de passe
-        pswd_ser = PasswordService()
-
-        # Cette méthode lève une exception si le mot de passe est invalide
-        pswd_ser.check_password_strength(password)
+        self.password_service.check_password_strength(password)
 
         # Hacher le mot de passe avant de l'enregistrer
-        hashed_password = pswd_ser.hash_password(password)
+        hashed_password = self.password_service.hash_password(password)
 
         # Créer le nouvel utilisateur dans la base de données avec le mot de passe haché
-        user_cree = UserDao().create_user(pseudo=pseudo, is_scout=is_scout, pswd=hashed_password)
-
+        user_cree = self.user_repo.create_user(username=pseudo, is_scout=is_scout, password=hashed_password)
 
         if user_cree:
             return "Vous êtes bien inscrit !"
         else:
             raise ValueError("Erreur lors de l'inscription de l'utilisateur.")
 
-
-
-
     def log_in(self, pseudo: str, password: str) -> dict:
-
-    # Récupérer l'utilisateur par son pseudo
-        user = UserDao().get_user_by_pseudo(pseudo)
         """
         Cette méthode permet à un utilisateur de se connecter en fournissant un pseudo et un mot de passe.
         Elle vérifie l'existence de l'utilisateur et renvoie un booléen pour indiquer le succès ou l'échec de la connexion.
 
-         Paramètres:
+        Paramètres:
         -----------
         pseudo : str
             Le pseudo de l'utilisateur.
@@ -74,22 +67,28 @@ class UserService:
 
         Retourne:
         ---------
-        bool
-            True si l'authentification est réussit, sinon on lève une exception.
+        dict
+            Un dictionnaire contenant le succès et le token JWT en cas d'authentification réussie.
+
+        Lève:
+        -----
+        ValueError:
+            Si l'identifiant ou le mot de passe est incorrect.
         """
-
+        
         # On récupère le pseudo de l'utilisateur
-        user = UserDao().get_user_by_pseudo(pseudo)
+        user = self.user_repo.get_by_username(pseudo)
 
-        # On Vérifie si l'utilisateur existe et si le mot de passe fourni est correct.
+        # Vérifie si l'utilisateur existe
         if not user:
             raise ValueError("Identifiant incorrect.")
+
         # Vérifier si le mot de passe correspond au pseudo
-        if not PasswordService().validate_pseudo_password(pseudo, password):  # Utiliser validate_password pour comparer
+        if not self.password_service.validate_password(pseudo, password):
             raise ValueError("Mot de passe incorrect.")
 
-        # générer un token JWT
-        jwt_response = JwtService(os.environ["JWT_SECRET"], "HS256").encode_jwt(user.id_user)
+        # Générer un token JWT
+        jwt_response = self.jwt_service.encode_jwt(user.id)
 
         # Retourner la réponse avec True et le token
         return {"success": True, "token": jwt_response.access_token}
