@@ -1,15 +1,19 @@
-import os 
-from src.dao.user_repo import UserRepo
+import os
+
+from dotenv import load_dotenv
+
 from src.dao.db_connection import DBConnection
+from src.dao.user_repo import UserRepo
 from src.Service.JWTService import JwtService
 from src.Service.PasswordService import PasswordService
 
+load_dotenv()
 
 class UserService:
     def __init__(self):
-        self.user_repo = UserRepo(DBConnection())  # Initialisation avec UserRepo
-        self.password_service = PasswordService()  # Initialisation avec PasswordService
-        self.jwt_service = JwtService(os.environ["JWT_SECRET"], "HS256")  # Initialisation avec JwtService
+        self.user_repo = UserRepo(DBConnection())
+        self.password_service = PasswordService()
+        self.jwt_service = JwtService(os.environ["JWT_SECRET"], "HS256")
 
     def register_user(self, pseudo: str, password: str, is_scout: bool = False) -> str:
         """
@@ -75,7 +79,7 @@ class UserService:
         ValueError:
             Si l'identifiant ou le mot de passe est incorrect.
         """
-        
+
         # On récupère le pseudo de l'utilisateur
         user = self.user_repo.get_by_username(pseudo)
 
