@@ -5,18 +5,22 @@ from typing import List
 
 from dotenv import load_dotenv
 
+from src.dao.db_connection import DBConnection
+from src.dao.user_repo import UserRepo
+
 load_dotenv()
 
 HOST = os.getenv("HOST")
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 DATABASE = os.getenv("DATABASE")
+SCHEMA = os.getenv("SCHEMA")
 
 import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.dao.user_dao import UserDao
+from src.dao.user_repo import UserRepo
 # from src.Model.Review import Review
 from src.Service.MovieService import MovieService
 from src.Service.PasswordService import PasswordService
@@ -66,10 +70,11 @@ async def get_movies_by_director(director_name: str):
         raise HTTPException(status_code=404, detail="Aucun film trouvé pour ce réalisateur.")
     return films
 
-
 # ########################### User ###########################################
 
-user_dao = UserDao()
+load_dotenv()
+db_connection = DBConnection()
+user_dao = UserRepo(db_connection)
 password_service = PasswordService()
 user_service = UserService()
 

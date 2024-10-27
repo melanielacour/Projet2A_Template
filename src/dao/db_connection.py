@@ -1,7 +1,10 @@
 import os
 from typing import Literal, Optional, Union
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
+
+
 class DBConnection:
     def __init__(self, config=None):
         if config is not None:
@@ -18,6 +21,7 @@ class DBConnection:
             self.user = os.environ["USER"]
             self.password = os.environ["PASSWORD"]
             self.schema = os.environ["SCHEMA"]
+
     def connection(self):
         return psycopg2.connect(
             host=self.host,
