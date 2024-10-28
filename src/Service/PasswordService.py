@@ -5,6 +5,7 @@ from typing import Optional
 
 from src.dao.user_repo import UserRepo
 from src.Model.User import User
+from src.dao.db_connection import DBConnection
 
 
 class PasswordService:
@@ -76,37 +77,24 @@ class PasswordService:
 
 
     def validate_pseudo_password(self, pseudo: str, password: str) -> User:
-        """
-        Cette méthode valide un pseudo et un mot de passe en vérifiant que l'utilisateur existe et que le mot de passe fourni est correct.
-        Si ce n'est pas le cas, on lève une exception si la validation échoue.
+        user_with_pseudo = UserRepo(DBConnection()).get_by_username(pseudo)
 
-        Paramètres:
-        -----------
-        pseudo : str
-            Le pseudo de l'utilisateur
-        password : str
-            Le mot de passe de l'utilisateur
-        user_repo : UserRepo
-            Le dépôt d'utilisateurs utilisé pour récupérer les informations de l'utilisateur.
-
-        Retourne:
-        ---------
-        User
-            L'objet User correspondant au pseudo valide.
-        """
-
-        # on récupère l'utilisateur correspondant au pseudo depuis le dépôt d'utilisateurs.
-        user_with_pseudo= UserDao().get_user_by_pseudo(pseudo)
-
-        # une exception est levée pour éviter que des utilisateurs non enregistrés ne puissent tenter de se connecter.
         if not user_with_pseudo:
             raise Exception(f"User with pseudo {pseudo} not found")
 
         self.check_password_strength(password)
 
-        salt_stored = user_with_pseudo.pswd[:256]
-        hashed_password_stored = user_with_pseudo.pswd[256:]
+        salt_stored = user_with_pseudo.password[:256]
+        hashed_password_stored = user_with_pseudo.password[256:]
+        
+        # Hachez le mot de passe fourni
         hashed_password = self.hash_password(password, salt_stored)[256:]
+
+        # Ajoutez des impressions pour déboguer
+        print(f"Pseudo: {pseudo}")
+        print(f"Stored Salt: {salt_stored}")
+        print(f"Stored Hashed Password: {hashed_password_stored}")
+        print(f"Provided Hashed Password: {hashed_password}")
 
         if hashed_password != hashed_password_stored:
             raise Exception("Incorrect password")

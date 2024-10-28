@@ -20,7 +20,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from src.dao.user_repo import UserRepo
-# from src.Model.Review import Review
+from src.Model.Review import Review
 from src.Service.MovieService import MovieService
 from src.Service.PasswordService import PasswordService
 from src.Service.UserService import UserService
@@ -80,11 +80,10 @@ user_service = UserService()
 class UserRegistration(BaseModel):
     pseudo: str
     password: str
-    is_scout: bool = False
 
 @app.post("/register", tags=["User"])
-def register_user(pseudo: str, password: str, is_scout: bool = False):
-    return user_service.register_user(pseudo, password, is_scout)
+def register_user(pseudo: str, password: str):
+    return user_service.register_user(pseudo, password)
 
 @app.post("/login", tags=["User"])
 def log_in(pseudo: str, password: str):

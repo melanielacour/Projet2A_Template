@@ -15,7 +15,7 @@ class UserService:
         self.password_service = PasswordService()
         self.jwt_service = JwtService(os.environ["JWT_SECRET"], "HS256")
 
-    def register_user(self, pseudo: str, password: str, is_scout: bool = False) -> str:
+    def register_user(self, pseudo: str, password: str) -> str:
         """
         Cette méthode permet d'inscrire un nouvel utilisateur dans le système.
 
@@ -25,8 +25,6 @@ class UserService:
             Le pseudo de l'utilisateur.
         password : str
             Le mot de passe de l'utilisateur.
-        is_scout : bool, optional
-            Indique si l'utilisateur est un éclaireur (scout). Par défaut, False.
 
         Retourne:
         ---------
@@ -40,6 +38,8 @@ class UserService:
         """
 
         # Vérifier si l'utilisateur existe déjà
+        pseudo = pseudo.strip()
+        password = password.strip()
         if self.user_repo.get_by_username(pseudo):
             raise ValueError("Cet identifiant est déjà utilisé.")
 
@@ -50,7 +50,7 @@ class UserService:
         hashed_password = self.password_service.hash_password(password)
 
         # Créer le nouvel utilisateur dans la base de données avec le mot de passe haché
-        user_cree = self.user_repo.create_user(username=pseudo, is_scout=is_scout, password=hashed_password)
+        user_cree = self.user_repo.insert_into_db(username=pseudo, salt= None, hashed_password=hashed_password)
 
         if user_cree:
             return "Vous êtes bien inscrit !"
@@ -88,7 +88,7 @@ class UserService:
             raise ValueError("Identifiant incorrect.")
 
         # Vérifier si le mot de passe correspond au pseudo
-        if not self.password_service.validate_password(pseudo, password):
+        if not self.password_service.validate_pseudo_password(pseudo, password):
             raise ValueError("Mot de passe incorrect.")
 
         # Générer un token JWT
