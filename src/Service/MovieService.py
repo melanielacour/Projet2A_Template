@@ -1,3 +1,4 @@
+import os
 import random
 from datetime import datetime
 
@@ -32,15 +33,34 @@ class MovieService:
         }
         return categories.get(category_name.lower())
 
-    def get_movie_by_title(self, title: str):
+    def get_movie_by_id(self, id: str) -> Film:
+        headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
+        details_url = f"https://api.themoviedb.org/3/movie/{id}?language=fr-FR"
+        details_response = requests.get(details_url, headers=headers)
+
+        if details_response.status_code == 200:
+            details_data = details_response.json()
+            return Film(
+                id_film=details_data["id"],
+                id_tmdb=details_data["id"],
+                title=details_data["title"],
+                producer=details_data.get("production_companies", [{"name": "Inconnu"}])[0].get("name", "Inconnu"),
+                category=details_data.get("genres", [{"name": "Inconnu"}])[0].get("name", "Inconnu"),
+                date=details_data["release_date"][:4] if "release_date" in details_data else "Inconnue"
+            )
+        else:
+            raise Exception(f"Erreur lors de la récupération des détails : {details_response.status_code}")
+
+    def get_movie_by_title(self, title: str) -> list[Film]:
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         search_url = f"https://api.themoviedb.org/3/search/movie?query={title}&language=fr-FR&page=1"
         search_response = requests.get(search_url, headers=headers)
 
         if search_response.status_code == 200:
             search_results = search_response.json()["results"]
-            if search_results:
-                film_data = search_results[0]
+
+            films = []
+            for film_data in search_results[:5]:
                 film_id = film_data["id"]
 
                 details_url = f"https://api.themoviedb.org/3/movie/{film_id}?language=fr-FR"
@@ -48,16 +68,17 @@ class MovieService:
 
                 if details_response.status_code == 200:
                     details_data = details_response.json()
-                    return Film(
+                    films.append(Film(
                         id_film=details_data["id"],
                         id_tmdb=details_data["id"],
                         title=details_data["title"],
                         producer=details_data.get("production_companies", [{"name": "Inconnu"}])[0].get("name", "Inconnu"),
                         category=details_data.get("genres", [{"name": "Inconnu"}])[0].get("name", "Inconnu"),
                         date=details_data["release_date"][:4] if "release_date" in details_data else "Inconnue"
-                    )
-                else:
-                    raise Exception(f"Erreur lors de la récupération des détails : {details_response.status_code}")
+                    ))
+
+            if films:
+                return films
             else:
                 raise Exception("Aucun film trouvé.")
         else:

@@ -44,13 +44,21 @@ class Film(BaseModel):
     ratings: list[int] = []
 
 
-@app.get("/movies/title/{title}", response_model=Film, tags=["Films"])
-async def get_movie_by_title(title: str):
-    film = service.get_movie_by_title(title)
+
+@app.get("/movies/title/{title}", response_model=List[Film], tags=["Films"])
+async def get_movies_by_title(title: str):
+    films = service.get_movie_by_title(title)
+    if not films:
+        raise HTTPException(status_code=404, detail="Aucun film trouvé")
+    return films
+
+
+@app.get("/movies/{id}", response_model=Film, tags=["Films"])
+async def get_movie_by_id(id: str):
+    film = service.get_movie_by_id(id)
     if not film:
         raise HTTPException(status_code=404, detail="Film non trouvé")
     return film
-
 
 @app.get("/movies/category/{category_name}", response_model=list[Film], tags=["Films"])
 async def get_movies_by_category(category_name: str):
