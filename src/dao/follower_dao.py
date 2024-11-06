@@ -80,3 +80,6 @@ class FollowerDao:
                 rows = cursor.fetchall()
 
         return [{"id": row["id"], "title": row["title"]} for row in rows]
+
+load_dotenv()
+print(FollowerDao(DBConnection).follow_scout)

@@ -114,3 +114,24 @@ class ReviewDao:
                     )
             return True
         return False
+
+    def update_review(self, review: Review):
+        """
+        Met à jour une critique existante dans la base de données.
+        """
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    UPDATE projet_2a.review
+                    SET rating = %(note)s, comment = %(comment)s
+                    WHERE id_review = %(id_review)s;
+                    """,
+                    {
+                        "note": review.note,
+                        "comment": review.comment,
+                        "id_review": review.id_review
+                    }
+                )
+        return review
+

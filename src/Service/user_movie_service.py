@@ -16,7 +16,11 @@ class UserMovieService:
         Récupère la liste des films que l'utilisateur a déjà regardés.
         """
         return self.user_movie_dao.get_movies_by_user(id_user, status="watched")
-
+    
+    def add_movie_to_list(self, id_user: int, id_film: int, status: str):
+        """Ajoute un film dans la liste de l'utilisateur ou modifie son statut s'il est déjà présent."""
+        return self.user_movie_dao.add_movie(id_user=id_user, id_film=id_film, status=status)
+    
     def add_movie_to_watchlist(self, id_user, id_film):
         """
         Ajoute un film à la liste des films à regarder.
