@@ -2,7 +2,8 @@ import os
 import time
 
 import jwt
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError  # Correction ici
+from jwt.exceptions import (ExpiredSignatureError,  # Correction ici
+                            InvalidTokenError)
 
 from src.Model.JWTResponse import JWTResponse
 
