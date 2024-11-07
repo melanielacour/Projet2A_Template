@@ -21,6 +21,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jwt.exceptions import ExpiredSignatureError
+
 
 from src.dao.user_repo import UserRepo
 from src.Model.Review import Review
@@ -135,7 +137,6 @@ review_dao = ReviewDao(db_connection)
 review_service = ReviewService(ReviewDao(DBConnection()))
 
 class ReviewRequest(BaseModel):
-    id_user: int = Depends(get_current_user)
     note: Optional[int] = None
     comment: Optional[str] = None
 
@@ -144,7 +145,7 @@ async def post_review_by_id_local(id_local: int, review: ReviewRequest, id_user:
     try:
         return review_service.search_and_rate_movie_existing_movie(
             id_film=id_local, 
-            id_user=review.id_user, 
+            id_user=id_user, 
             note=review.note, 
             comment=review.comment
         )
@@ -157,7 +158,7 @@ async def post_review_by_id_tmdb(id_tmdb: int, title: str, review: ReviewRequest
         return review_service.search_and_rate_movie_by_idtmdb(
             id_tmdb=id_tmdb, 
             title=title, 
-            id_user=review.id_user, 
+            id_user=id_user, 
             note=review.note, 
             comment=review.comment
         )

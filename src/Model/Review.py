@@ -12,13 +12,13 @@ class Review:
         L'identifiant du commentaire déposé
     comment : str
         Le message du commentaire
-
+    note : int
+        La note attribuée au film
     """
 
-    def __init__(self, id_tmdb: int, id_user: int, id_review: int, comment: str, note: int):
-        self.id_tmdb = id_tmdb
+    def __init__(self, id_film: int, id_user: int, id_review: int, comment: str, note: int):
+        self.id_film = id_film
         self.id_user = id_user
         self.id_review = id_review
         self.comment = comment
-        self.note= note
-
+        self.note = note

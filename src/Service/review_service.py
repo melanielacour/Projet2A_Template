@@ -82,6 +82,7 @@ class ReviewService:
         movie = MovieRepo(DBConnection()).get_movie_by_tmdb_id(id_tmdb)
         if not movie:
             movie2 = MovieRepo(DBConnection()).add_movie(id_tmdb=id_tmdb, title=title)
+            movie = MovieRepo(DBConnection()).get_movie_by_tmdb_id(id_tmdb)
             if not movie2:
                 raise ValueError("Échec de l'ajout du film dans la base données")
         return self.search_and_rate_movie_existing_movie(movie.id_local, id_user, note, comment)    
