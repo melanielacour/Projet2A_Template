@@ -1,5 +1,5 @@
 from src.dao.db_connection import DBConnection
-from src.Model.follower import Follower
+from src.dao.user_repo import UserRepo
 
 class FollowerDao:
     def __init__(self, db_connection: DBConnection):
@@ -50,6 +50,9 @@ class FollowerDao:
 
     def get_followers_of_scout(self, id_scout):
         """Récupère la liste des utilisateurs qui suivent un éclaireur"""
+        user= UserRepo(DBConnection()).get_by_id(id_scout)
+        if not user.is_scout:
+            raise ValueError("Vous n'êtes pas éclaireur !")
         with self.db_connection.connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
@@ -63,8 +66,15 @@ class FollowerDao:
 
         return [row["id_follower"] for row in rows]
 
-    def get_watchlist_of_scouts(self, id_follower):
+    def get_watchlist_of_scouts(self, id_follower, id_scout):
         """Récupère la watchlist de tous les éclaireurs suivis par un utilisateur"""
+        
+        # Vérification que l'utilisateur suit l'éclaireur
+        scouts_suivis = self.get_scouts_followed_by_user(id_follower)
+        if id_scout not in scouts_suivis:
+            raise ValueError("Vous ne suivez pas cet éclaireur")
+        
+        # Récupération de la watchlist de l'éclaireur suivi
         with self.db_connection.connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
@@ -73,13 +83,13 @@ class FollowerDao:
                     FROM projet_2a.followers
                     JOIN projet_2a.user_movies ON user_movies.id_user = followers.id_scout
                     JOIN projet_2a.films ON films.id = user_movies.id_film
-                    WHERE followers.id_follower = %(id_follower)s AND user_movies.status = 'to_watch';
+                    WHERE followers.id_follower = %(id_follower)s 
+                    AND user_movies.status = 'to_watch' 
+                    AND followers.id_scout = %(id_scout)s;
                     """,
-                    {"id_follower": id_follower}
+                    {"id_follower": id_follower, "id_scout": id_scout}
                 )
                 rows = cursor.fetchall()
 
+        # Retourner la liste des films à regarder (watchlist) sous forme de dictionnaires
         return [{"id": row["id"], "title": row["title"]} for row in rows]
-
-load_dotenv()
-print(FollowerDao(DBConnection).follow_scout)

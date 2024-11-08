@@ -124,6 +124,45 @@ def register_user(pseudo: str, password: str):
 def log_in(pseudo: str, password: str):
     return user_service.log_in(pseudo, password)
 
+class UpdatePseudoRequest(BaseModel):
+    new_pseudo: str
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@app.put("/user/update-pseudo", tags=["User"])
+async def update_pseudo(request: UpdatePseudoRequest, user_id: int = Depends(get_current_user)):
+    try:
+        message = user_service.update_pseudo(user_id=user_id, new_pseudo=request.new_pseudo)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.put("/user/update-password", tags=["User"])
+async def update_password(request: UpdatePasswordRequest, user_id: int = Depends(get_current_user)):
+    try:
+        message = user_service.update_password(user_id=user_id, current_password=request.current_password, new_password=request.new_password)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.put("/user/promote-to-scout", tags=["User"])
+async def promote_to_scout(user_id: int = Depends(get_current_user)):
+    try:
+        message = user_service.promote_to_scout(user_id=user_id)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.put("/user/demote-scout", tags=["User"])
+async def demote_scout(user_id: int = Depends(get_current_user)):
+    try:
+        message = user_service.demote_scout(user_id=user_id)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 # ########################### Reviews ########################################
 
@@ -293,3 +332,46 @@ async def get_all_movies(service: UserMovieService = Depends(get_user_movie_serv
     if not all_movies:
         raise HTTPException(status_code=404, detail="Aucun film trouvé")
     return all_movies
+
+
+###########################Eclaireur###########################################
+from fastapi import APIRouter, HTTPException, Depends
+from src.dao.db_connection import DBConnection
+from src.dao.follower_dao import FollowerDao
+
+# Endpoint pour suivre un éclaireur
+@app.post("/scouts/{id_scout}/follow", summary="Suivre un éclaireur", tags=["Eclaireur"])
+async def follow_scout(id_scout: int, db: DBConnection = Depends(), id_follower: int = Depends(get_current_user)):
+    follower_dao = FollowerDao(db)
+    if follower_dao.follow_scout(id_follower=id_follower, id_scout=id_scout):
+        return {"message": "Eclaireur suivi avec succès"}
+    raise HTTPException(status_code=400, detail="Impossible de suivre l'éclaireur")
+
+# Endpoint pour ne plus suivre un éclaireur
+@app.delete("/scouts/{id_scout}/unfollow", summary="Ne plus suivre un éclaireur",tags=["Eclaireur"])
+async def unfollow_scout(id_scout: int, id_follower: int = Depends(get_current_user), db: DBConnection = Depends()):
+    follower_dao = FollowerDao(db)
+    if follower_dao.unfollow_scout(id_follower=id_follower, id_scout=id_scout):
+        return {"message": "Eclaireur non suivi avec succès"}
+    raise HTTPException(status_code=400, detail="Impossible de ne plus suivre l'éclaireur")
+
+# Endpoint pour obtenir la liste des éclaireurs suivis par un utilisateur
+@app.get("/users/{id_follower}/scouts", summary="Liste des éclaireurs suivis", tags=["Eclaireur"])
+async def get_scouts_followed_by_user( id_follower: int = Depends(get_current_user), db: DBConnection = Depends()):
+    follower_dao = FollowerDao(db)
+    scouts = follower_dao.get_scouts_followed_by_user(id_follower=id_follower)
+    return {"scouts": scouts}
+
+# Endpoint pour obtenir la liste des utilisateurs qui suivent un éclaireur
+@app.get("/scouts/{id_scout}/followers", summary="Liste des followers d'un éclaireur", tags=["Followers"])
+async def get_followers_of_scout(id_scout:  int = Depends(get_current_user), db: DBConnection = Depends()):
+    follower_dao = FollowerDao(db)
+    followers = follower_dao.get_followers_of_scout(id_scout=id_scout)
+    return {"followers": followers}
+
+# Endpoint pour obtenir la watchlist des éclaireurs suivis par un utilisateur
+@app.get("/users/{id_follower}/scouts/watchlist", summary="Watchlist des éclaireurs suivis",tags=["Eclaireur"])
+async def get_watchlist_of_scouts(id_scout: int,did_follower: int = Depends(get_current_user), db: DBConnection = Depends()):
+    follower_dao = FollowerDao(db)
+    watchlist = follower_dao.get_watchlist_of_scouts(id_follower=id_follower,id_scout= id_scout)
+    return {"watchlist": watchlist}

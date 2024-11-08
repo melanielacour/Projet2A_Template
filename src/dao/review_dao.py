@@ -140,9 +140,8 @@ class ReviewDao:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT review.* FROM projet_2a.film
-                    JOIN projet_2a.review ON review.id_film = film.id
-                    WHERE film.id_user = %(user_id)s;
+                    SELECT * FROM projet_2a.review
+                    WHERE review.id_user = %(user_id)s;
                     """,
                     {"user_id": user_id}
                 )

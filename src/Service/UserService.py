@@ -115,9 +115,10 @@ class UserService:
         str
             Message de confirmation si le pseudo est modifié avec succès.
         """
-        existing_user=self.user_repo.get_by_id(user_id)
+        existing_user = self.user_repo.get_by_id(user_id)
         if not existing_user:
-            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte")
+            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte.")
+        
         # Vérifier si le nouveau pseudo est déjà pris
         if self.user_repo.get_by_username(new_pseudo):
             raise ValueError("Ce pseudo est déjà utilisé.")
@@ -125,7 +126,6 @@ class UserService:
         # Mettre à jour le pseudo
         self.user_repo.update_pseudo(user_id, new_pseudo)
         return "Le pseudo a été mis à jour avec succès."
-
     def update_password(self, user_id: int, current_password: str, new_password: str) -> str:
         """
         Permet de changer le mot de passe d'un utilisateur.
@@ -145,9 +145,10 @@ class UserService:
             Message de confirmation si le mot de passe est modifié avec succès.
         """
         # Vérifier le mot de passe actuel
-        user = self.user_repo.get_user_by_id(user_id)
+        user = self.user_repo.get_by_id(user_id)
         if not user:
-            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte")
+            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte.")
+        
         if not self.password_service.validate_pseudo_password(user.username, current_password):
             raise ValueError("Mot de passe actuel incorrect.")
 
@@ -178,7 +179,7 @@ class UserService:
         user=self.user_repo.get_by_id(user_id)
         if user.is_scout:
             raise ValueError("Vous êtes déja un éclaireur")
-        user_reviews = ReviewDao(DBConnection).get_all_reviews_by_user_id(user_id)
+        user_reviews = ReviewDao(DBConnection()).get_all_reviews_by_user_id(user_id)
         if len(user_reviews) >= 10:
             self.user_repo.update_status(user_id, True)
             return "Vous êtes maintenant éclaireur !"

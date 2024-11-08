@@ -48,15 +48,15 @@ class UserRepo:
 
     def update_pseudo(self, user_id: int, new_pseudo: str) -> bool:
         query = "UPDATE users SET username = %(new_pseudo)s WHERE id = %(user_id)s"
-        with self.db_connection as conn:
-            with conn.cursor() as cursor:
+        with self.db_connection.connection() as connection:
+            with connection.cursor() as cursor:
                 cursor.execute(query, {"new_pseudo":new_pseudo, "user_id" :user_id}) 
                 return cursor.rowcount > 0  # True si la mise à jour a réussi
 
     def update_password(self, user_id: int, hashed_password: str) -> bool:
         query = "UPDATE users SET hashed_password = %(hashed_password)s WHERE id = %(user_id)s"
-        with self.db_connection as conn:
-            with conn.cursor() as cursor:
+        with self.db_connection.connection() as connection:
+            with connection.cursor() as cursor:
                 cursor.execute(query, {"hashed_password": hashed_password, "user_id" :user_id})
                 return cursor.rowcount > 0
 
