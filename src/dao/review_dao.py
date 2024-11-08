@@ -135,3 +135,28 @@ class ReviewDao:
                 )
         return review
 
+    def get_all_reviews_by_user_id(self, user_id):
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT review.* FROM projet_2a.film
+                    JOIN projet_2a.review ON review.id_film = film.id
+                    WHERE film.id_user = %(user_id)s;
+                    """,
+                    {"user_id": user_id}
+                )
+                res = cursor.fetchall()
+
+        liste_review = []
+        for row in res:
+            review1 = Review(
+                id_review=row["id_review"],
+                id_film=row["id_film"],
+                id_user=row["id_user"],
+                comment=row["comment"],
+                note=row["rating"]
+            )
+            liste_review.append(review1)
+
+        return liste_review

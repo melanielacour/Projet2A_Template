@@ -6,6 +6,8 @@ from src.dao.db_connection import DBConnection
 from src.dao.user_repo import UserRepo
 from src.Service.JWTService import JwtService
 from src.Service.PasswordService import PasswordService
+from src.dao.review_dao import ReviewDao
+from src.dao.follower_dao import FollowerDao
 
 load_dotenv()
 
@@ -96,3 +98,112 @@ class UserService:
 
         # Retourner la réponse avec True et le token
         return {"success": True, "token": jwt_response.access_token}
+
+    def update_pseudo(self, user_id: int, new_pseudo: str) -> str:
+        """
+        Permet de changer le pseudo d'un utilisateur.
+
+        Paramètres:
+        -----------
+        user_id : int
+            L'identifiant de l'utilisateur.
+        new_pseudo : str
+            Le nouveau pseudo souhaité.
+
+        Retourne:
+        ---------
+        str
+            Message de confirmation si le pseudo est modifié avec succès.
+        """
+        existing_user=self.user_repo.get_by_id(user_id)
+        if not existing_user:
+            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte")
+        # Vérifier si le nouveau pseudo est déjà pris
+        if self.user_repo.get_by_username(new_pseudo):
+            raise ValueError("Ce pseudo est déjà utilisé.")
+        
+        # Mettre à jour le pseudo
+        self.user_repo.update_pseudo(user_id, new_pseudo)
+        return "Le pseudo a été mis à jour avec succès."
+
+    def update_password(self, user_id: int, current_password: str, new_password: str) -> str:
+        """
+        Permet de changer le mot de passe d'un utilisateur.
+
+        Paramètres:
+        -----------
+        user_id : int
+            L'identifiant de l'utilisateur.
+        current_password : str
+            Le mot de passe actuel pour vérification.
+        new_password : str
+            Le nouveau mot de passe souhaité.
+
+        Retourne:
+        ---------
+        str
+            Message de confirmation si le mot de passe est modifié avec succès.
+        """
+        # Vérifier le mot de passe actuel
+        user = self.user_repo.get_user_by_id(user_id)
+        if not user:
+            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte")
+        if not self.password_service.validate_pseudo_password(user.username, current_password):
+            raise ValueError("Mot de passe actuel incorrect.")
+
+        # Vérifier la force du nouveau mot de passe
+        self.password_service.check_password_strength(new_password)
+
+        # Mettre à jour le mot de passe avec le nouveau mot de passe haché
+        hashed_password = self.password_service.hash_password(new_password)
+        self.user_repo.update_password(user_id, hashed_password)
+        return "Le mot de passe a été mis à jour avec succès."
+
+
+    def promote_to_scout(self, user_id: int) -> str:
+        """
+        Passe le statut de l'utilisateur à éclaireur (true) si celui-ci a au moins 10 commentaires.
+
+        Paramètres:
+        -----------
+        user_id : int
+            Identifiant de l'utilisateur.
+
+        Retourne:
+        ---------
+        str
+            Message confirmant le passage à éclaireur ou indiquant le non-respect des conditions.
+        """
+        # Vérification du nombre de commentaires de l'utilisateur
+        user=self.user_repo.get_by_id(user_id)
+        if user.is_scout:
+            raise ValueError("Vous êtes déja un éclaireur")
+        user_reviews = ReviewDao(DBConnection).get_all_reviews_by_user_id(user_id)
+        if len(user_reviews) >= 10:
+            self.user_repo.update_status(user_id, True)
+            return "Vous êtes maintenant éclaireur !"
+        else:
+            return "Vous ne remplissez pas les conditions nécessaires pour devenir éclaireur."
+
+    def demote_scout(self, user_id: int) -> str:
+        """
+        Révoque le statut éclaireur de l'utilisateur, passant `is_scout` à false.
+
+        Paramètres:
+        -----------
+        user_id : int
+            Identifiant de l'utilisateur.
+
+        Retourne:
+        ---------
+        str
+            Message confirmant la révocation du statut éclaireur.
+        """
+        user=self.user_repo.get_by_id(user_id)
+        if not user.is_scout:
+            raise ValueError("Vous n'êtes pas un éclaireur")
+        self.user_repo.update_status(user_id, False)
+        liste=FollowerDao(DBConnection).get_followers_of_scout(user_id)
+        for val in liste:
+            res=FollowerDao(DBConnection).unfollow_scout(id_follower=val, id_scout=user_id)
+        return "Votre statut éclaireur a été révoqué."
