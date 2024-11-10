@@ -1,4 +1,18 @@
 class User:
+    """
+    Cette classe représente un utilisateur aves ses attributs (identifiant,
+    pseudo, mot de passe, statut d'éclaireur ou non). Elle est utilisée
+    pour gérer les utilisateurs dans l'application.
+
+    Attributs:
+    ----------
+
+    id: int
+        L'identifiant de l'utilisateur
+    username: int 
+        Le pseudo de l'utilisateur
+    salt :
+    """
     def __init__(self, id: int, username: str, salt: str, password: str, is_scout:bool):
         self.id = id
         self.username = username

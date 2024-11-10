@@ -34,7 +34,7 @@ class Film:
     """
     
     def __init__(self, id_film, id_tmdb: int, title: str, producer: str, category: str, date: str):
-        # Vérifiez que id_film est un entier, sinon levez une ValidationError
+        # Vérifie que id_film est un entier, sinon lève une ValidationError
         if not isinstance(id_film, int):
             try:
                 # Essayez de convertir id_film en entier
@@ -42,9 +42,9 @@ class Film:
             except ValueError:
                 raise ValueError("id_film must be an integer, unable to parse string as an integer")
         else:
-            self.id_film = id_film  # Si c'est déjà un entier, assignez-le directement
+            self.id_film = id_film  # Si c'est déjà un entier, assigne-le directement
 
-        # Vérifiez que id_tmdb est un entier
+        # Vérifie que id_tmdb est un entier
         if not isinstance(id_tmdb, int):
             raise ValueError("id_tmdb must be an integer")
 
@@ -58,8 +58,10 @@ class Film:
 
     def calculation_mean(self) -> float:
         """Calcule la note moyenne à partir des notes données au film."""
+        # Vérifie que des notes existes pour ce film
         if not self.ratings:
             return None
+        # Formule de calcul de la moyenne
         self.average_rate = sum(self.ratings) / len(self.ratings)
         return self.average_rate
         
@@ -71,6 +73,7 @@ class Film:
         rating : int
             La note à ajouter (doit être comprise entre 1 et 10)."""
         
+        # Vérifie que la note est comprise entre 1 et 10
         if 1 <= rating <= 10:
             self.ratings.append(rating)
             self.calculation_mean()
