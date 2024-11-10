@@ -1,8 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 
-from .MovieController import movie_router
-from .UserController import user_router
+from src.app.MovieController import movie_router
+from src.app.UserController import user_router
 
 
 def run_app():
