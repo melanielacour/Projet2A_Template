@@ -26,11 +26,11 @@ class UserRegistration(BaseModel):
     pseudo: str
     password: str
 
-@user_router.post("/register", tags=["User"])
+@user_router.post("/register")
 def register_user(pseudo: str, password: str):
     return user_service.register_user(pseudo, password)
 
-@user_router.post("/login", tags=["User"])
+@user_router.post("/login")
 def log_in(pseudo: str, password: str):
     return user_service.log_in(pseudo, password)
 
@@ -42,7 +42,7 @@ class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
 
-@user_router.put("/user/update-pseudo", tags=["User"])
+@user_router.put("/user/update-pseudo")
 async def update_pseudo(request: UpdatePseudoRequest, user_id: int = Depends(get_current_user)):
     try:
         message = user_service.update_pseudo(user_id=user_id, new_pseudo=request.new_pseudo)
@@ -50,7 +50,7 @@ async def update_pseudo(request: UpdatePseudoRequest, user_id: int = Depends(get
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@user_router.put("/user/update-password", tags=["User"])
+@user_router.put("/user/update-password")
 async def update_password(request: UpdatePasswordRequest, user_id: int = Depends(get_current_user)):
     try:
         message = user_service.update_password(user_id=user_id, current_password=request.current_password, new_password=request.new_password)
@@ -58,7 +58,7 @@ async def update_password(request: UpdatePasswordRequest, user_id: int = Depends
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@user_router.put("/user/promote-to-scout", tags=["User"])
+@user_router.put("/user/promote-to-scout")
 async def promote_to_scout(user_id: int = Depends(get_current_user)):
     try:
         message = user_service.promote_to_scout(user_id=user_id)
@@ -66,7 +66,7 @@ async def promote_to_scout(user_id: int = Depends(get_current_user)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@user_router.put("/user/demote-scout", tags=["User"])
+@user_router.put("/user/demote-scout")
 async def demote_scout(user_id: int = Depends(get_current_user)):
     try:
         message = user_service.demote_scout(user_id=user_id)

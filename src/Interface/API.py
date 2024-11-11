@@ -104,65 +104,6 @@ async def get_movies_by_director(director_name: str):
         raise HTTPException(status_code=404, detail="Aucun film trouvé pour ce réalisateur.")
     return films
 
-# ########################### User ###########################################
-
-db_connection = DBConnection()
-user_dao = UserRepo(db_connection)
-password_service = PasswordService()
-user_service = UserService()
-
-
-class UserRegistration(BaseModel):
-    pseudo: str
-    password: str
-
-@app.post("/register", tags=["User"])
-def register_user(pseudo: str, password: str):
-    return user_service.register_user(pseudo, password)
-
-@app.post("/login", tags=["User"])
-def log_in(pseudo: str, password: str):
-    return user_service.log_in(pseudo, password)
-
-class UpdatePseudoRequest(BaseModel):
-    new_pseudo: str
-
-class UpdatePasswordRequest(BaseModel):
-    current_password: str
-    new_password: str
-
-@app.put("/user/update-pseudo", tags=["User"])
-async def update_pseudo(request: UpdatePseudoRequest, user_id: int = Depends(get_current_user)):
-    try:
-        message = user_service.update_pseudo(user_id=user_id, new_pseudo=request.new_pseudo)
-        return {"message": message}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.put("/user/update-password", tags=["User"])
-async def update_password(request: UpdatePasswordRequest, user_id: int = Depends(get_current_user)):
-    try:
-        message = user_service.update_password(user_id=user_id, current_password=request.current_password, new_password=request.new_password)
-        return {"message": message}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.put("/user/promote-to-scout", tags=["User"])
-async def promote_to_scout(user_id: int = Depends(get_current_user)):
-    try:
-        message = user_service.promote_to_scout(user_id=user_id)
-        return {"message": message}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.put("/user/demote-scout", tags=["User"])
-async def demote_scout(user_id: int = Depends(get_current_user)):
-    try:
-        message = user_service.demote_scout(user_id=user_id)
-        return {"message": message}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
 
 # ########################### Reviews ########################################
 
