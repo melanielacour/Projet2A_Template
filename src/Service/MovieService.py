@@ -4,7 +4,7 @@ from datetime import datetime
 
 import requests
 
-from src.Model.Film import Film
+from src.Model.movie import Movie
 
 TMDB_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3YTM1YmQwMDE2Mzk5MDNmNWM4MzBlODhkZDg2ZWQzMCIsIm5iZiI6MTcyOTU4MTc0MS41Nzg2NTEsInN1YiI6IjY2ZTQ0NmI5OTAxM2ZlODcyMjI0MTc1MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UvX882tvk0XKaN5mrivSQzXfzzXEOAqSX_4nzSfscFY"
 TMDB_API_KEY = "7a35bd001639903f5c830e88dd86ed30"
@@ -33,14 +33,14 @@ class MovieService:
         }
         return categories.get(category_name.lower())
 
-    def get_movie_by_id(self, id: str) -> Film:
+    def get_movie_by_id(self, id: str) -> Movie:
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         details_url = f"https://api.themoviedb.org/3/movie/{id}?language=fr-FR"
         details_response = requests.get(details_url, headers=headers)
 
         if details_response.status_code == 200:
             details_data = details_response.json()
-            return Film(
+            return Movie(
                 id_film=details_data["id"],
                 id_tmdb=details_data["id"],
                 title=details_data["title"],
@@ -51,7 +51,7 @@ class MovieService:
         else:
             raise Exception(f"Erreur lors de la récupération des détails : {details_response.status_code}")
 
-    def get_movie_by_title(self, title: str) -> list[Film]:
+    def get_movie_by_title(self, title: str) -> list[Movie]:
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         search_url = f"https://api.themoviedb.org/3/search/movie?query={title}&language=fr-FR&page=1"
         search_response = requests.get(search_url, headers=headers)
@@ -68,7 +68,7 @@ class MovieService:
 
                 if details_response.status_code == 200:
                     details_data = details_response.json()
-                    films.append(Film(
+                    films.append(Movie(
                         id_film=details_data["id"],
                         id_tmdb=details_data["id"],
                         title=details_data["title"],
@@ -99,7 +99,7 @@ class MovieService:
 
                 if details_response.status_code == 200:
                     details_data = details_response.json()
-                    film = Film(
+                    film = Movie(
                         id_film=details_data["id"],
                         id_tmdb=details_data["id"],
                         title=details_data["title"],
@@ -127,7 +127,7 @@ class MovieService:
 
                 if details_response.status_code == 200:
                     details_data = details_response.json()
-                    film = Film(
+                    film = Movie(
                         id_film=details_data["id"],
                         id_tmdb=details_data["id"],
                         title=details_data["title"],
