@@ -1,8 +1,7 @@
 import os
 import time
 from datetime import datetime
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from dotenv import load_dotenv
 
@@ -17,19 +16,16 @@ PASSWORD = os.getenv("PASSWORD")
 DATABASE = os.getenv("DATABASE")
 
 import requests
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from fastapi import Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import ExpiredSignatureError
-
+from pydantic import BaseModel
 
 from src.dao.user_repo import UserRepo
 from src.Model.Review import Review
 from src.Service.MovieService import MovieService
 from src.Service.PasswordService import PasswordService
 from src.Service.UserService import UserService
-
 
 app = FastAPI()
 service = MovieService()
@@ -40,8 +36,9 @@ service = MovieService()
 
 # Fonction de dépendance pour valider le token
 from src.Service.JWTService import JwtService
+
 jwt_service=JwtService(os.environ["JWT_SECRET"], "HS256")
-security = HTTPBearer() 
+security = HTTPBearer()
 
 
 # Fonction de dépendance pour valider le token
@@ -108,8 +105,8 @@ async def get_movies_by_director(director_name: str):
 # ########################### Reviews ########################################
 
 from src.dao.review_dao import ReviewDao
-from src.Service.review_service import ReviewService
 from src.Model.Review import Review
+from src.Service.review_service import ReviewService
 
 review_dao = ReviewDao(db_connection)
 
@@ -124,9 +121,9 @@ class ReviewRequest(BaseModel):
 async def post_review_by_id_local(id_local: int, review: ReviewRequest, id_user: int = Depends(get_current_user)):
     try:
         return review_service.search_and_rate_movie_existing_movie(
-            id_film=id_local, 
-            id_user=id_user, 
-            note=review.note, 
+            id_film=id_local,
+            id_user=id_user,
+            note=review.note,
             comment=review.comment
         )
     except ValueError as e:
@@ -136,10 +133,10 @@ async def post_review_by_id_local(id_local: int, review: ReviewRequest, id_user:
 async def post_review_by_id_tmdb(id_tmdb: int, title: str, review: ReviewRequest, id_user: int = Depends(get_current_user)):
     try:
         return review_service.search_and_rate_movie_by_idtmdb(
-            id_tmdb=id_tmdb, 
-            title=title, 
-            id_user=id_user, 
-            note=review.note, 
+            id_tmdb=id_tmdb,
+            title=title,
+            id_user=id_user,
+            note=review.note,
             comment=review.comment
         )
     except ValueError as e:
@@ -181,6 +178,7 @@ async def get_average_rating(id_film: int):
 from src.dao.movie_local import MovieRepo
 from src.Model.movie_simple import MovieSimple
 
+
 # Déclaration du modèle de réponse pour un film
 class MovieSimple(BaseModel):
     id_local: int
@@ -197,10 +195,12 @@ async def get_movie_by_tmdb_id(id_tmdb: int):
         raise HTTPException(status_code=404, detail="Film non trouvé")
     return movie
 
+from src.dao.user_movies_dao import UserMovieDao
 # ########################### UserMovie ########################################
 from src.Model.user_movie import UserMovie
 from src.Service.user_movie_service import UserMovieService
-from src.dao.user_movies_dao import UserMovieDao
+
+
 # Dependency pour obtenir l'instance de UserMovieService
 def get_user_movie_service():
     db_connection = DBConnection()
@@ -276,9 +276,11 @@ async def get_all_movies(service: UserMovieService = Depends(get_user_movie_serv
 
 
 ###########################Eclaireur###########################################
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
+
 from src.dao.db_connection import DBConnection
 from src.dao.follower_dao import FollowerDao
+
 
 # Endpoint pour suivre un éclaireur
 @app.post("/scouts/{id_scout}/follow", summary="Suivre un éclaireur", tags=["Eclaireur"])
