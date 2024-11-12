@@ -2,15 +2,15 @@ import os
 import time
 
 import jwt
-from jwt.exceptions import (ExpiredSignatureError,  # Correction ici
-                            InvalidTokenError)
+from jwt.exceptions import ExpiredSignatureError  # Correction ici
+from jwt.exceptions import InvalidTokenError
 
 from src.Model.JWTResponse import JWTResponse
 
 
 class JwtService:
     """
-    Gestionnaire pour le cryptage et la validation des JWT
+    Cette méthode gère la création, la déchiffrement et la validation de jetons JWT pour authentifier les utilisateurs de manière sécurisée.
     """
 
     def __init__(self, secret: str = "", algorithm: str = "HS256"):
@@ -22,7 +22,17 @@ class JwtService:
 
     def encode_jwt(self, user_id: int) -> JWTResponse:
         """
-        Crée un jeton avec une durée d'expiration de 10 minutes
+        Cette méthode génère un nouveau JWT incluant son identifiant (user_id) et une date d'expiration fixée à 10 minutes.
+
+        Paramètres:
+        -----------
+        user_id : int
+            Identifiant de l'utilisateur
+        
+        Retourne:
+        ---------
+        JWTResponse
+
         """
         payload = {"user_id": user_id, "expiry_timestamp": time.time() + 600}
         token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
@@ -31,14 +41,35 @@ class JwtService:
 
     def decode_jwt(self, token: str) -> dict:
         """
-        Déchiffre un jeton d'authentification
+        Cette méthode permet de déchiffrer un jeton d'authentification
+
+        Paramètres:
+        -----------
+        token : str
+            Le JWT à décoder
+        
+        Retourne:
+        ---------
+        dict
+            Dictionnaire contenant les données décryptées du jeton
         """
         return jwt.decode(token, self.secret, algorithms=[self.algorithm])
 
     def validate_user_jwt(self, token: str) -> str:
         """
-        Renvoie l'identifiant de l'utilisateur authentifié par le JWT
+        Cette méthode renvoie l'identifiant de l'utilisateur authentifié par le JWT
         Lance en cas de JWT invalide ou expiré
+
+         Paramètres:
+        -----------
+        token : str
+            Le JWT à décoder
+        
+        Retourne:
+        ---------
+        str
+           Une chaine contenant l'identifiant de l'utilisateur
+
         """
         decoded_jwt = self.decode_jwt(token)
         if decoded_jwt["expiry_timestamp"] < time.time():

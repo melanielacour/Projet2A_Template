@@ -3,9 +3,9 @@ import re
 import secrets
 from typing import Optional
 
+from src.dao.db_connection import DBConnection
 from src.dao.user_repo import UserRepo
 from src.Model.User import User
-from src.dao.db_connection import DBConnection
 
 
 class PasswordService:
