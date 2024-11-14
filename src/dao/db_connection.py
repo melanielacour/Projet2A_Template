@@ -6,13 +6,13 @@ from psycopg2.extras import RealDictCursor
 
 
 class DBConnection:
-    """ 
-    La classe permettant de gérer la connexion 
+    """
+    La classe permettant de gérer la connexion
     avec la base de données locale PostgreSQL.
 
     Attributs :
     -----------
-    
+
     """
     def __init__(self, config=None):
         if config is not None:
@@ -28,16 +28,15 @@ class DBConnection:
             self.database = os.environ["DATABASE"]
             self.user = os.environ["USER"]
             self.password = os.environ["PASSWORD"]
-        user=self.user,
-            password=self.password,
-            options=f"-c search_path={self.schema}",
-            cursor_factory=RealDictCursor,
-        )
-    self.schema = os.environ["SCHEMA"]
+            self.schema = os.environ["SCHEMA"]
 
     def connection(self):
         return psycopg2.connect(
             host=self.host,
             port=self.port,
             database=self.database,
-            
+            user=self.user,
+            password=self.password,
+            options=f"-c search_path={self.schema}",
+            cursor_factory=RealDictCursor,
+        )

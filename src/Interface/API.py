@@ -108,7 +108,7 @@ from src.dao.review_dao import ReviewDao
 from src.Model.Review import Review
 from src.Service.review_service import ReviewService
 
-review_dao = ReviewDao(db_connection)
+review_dao = ReviewDao(DBConnection())
 
 # Initialisation de ReviewService
 review_service = ReviewService(ReviewDao(DBConnection()))

@@ -4,7 +4,7 @@ from datetime import datetime
 
 import requests
 
-from src.Model.movie import Movie
+from src.Model.Movie import Movie
 
 TMDB_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3YTM1YmQwMDE2Mzk5MDNmNWM4MzBlODhkZDg2ZWQzMCIsIm5iZiI6MTcyOTU4MTc0MS41Nzg2NTEsInN1YiI6IjY2ZTQ0NmI5OTAxM2ZlODcyMjI0MTc1MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UvX882tvk0XKaN5mrivSQzXfzzXEOAqSX_4nzSfscFY"
 TMDB_API_KEY = "7a35bd001639903f5c830e88dd86ed30"
@@ -76,7 +76,7 @@ class MovieService:
             raise Exception(f"Erreur lors de la récupération des détails : {details_response.status_code}")
 
     def get_movie_by_title(self, title: str) -> list[Movie]:
-         """
+        """
         Méthode qui récupère un film à partir de son titre.
 
         Parameters
@@ -201,7 +201,7 @@ class MovieService:
             raise Exception(f"Erreur lors de la récupération des films par réalisateur : {response.status_code} - {response.text}")
 
     def get_movies_by_director_name(self, director_name: str):
-         """
+        """
         Méthode qui récupère des films à partir du nom de leur réalisateur.
 
         Parameters
