@@ -23,14 +23,7 @@ class Movie:
         Genre du film.
     date : str
         Date de sortie du film.
-    
-    Méthodes:
-    ---------
-    calculation_mean(self): float
-        Calcule la note moyenne.
 
-    add_rating(self, rating: int) -> None:
-        Ajoute une note à la liste de données.
     """
     
     def __init__(self, id_film, id_tmdb: int, title: str, producer: str, category: str, date: str):
@@ -53,29 +46,4 @@ class Movie:
         self.producer = producer
         self.category = category
         self.date = date
-        self.average_rate = 0.0
-        self.ratings: list[int] = []
 
-    def calculation_mean(self) -> float:
-        """Calcule la note moyenne à partir des notes données au film."""
-        # Vérifie que des notes existes pour ce film
-        if not self.ratings:
-            return None
-        # Formule de calcul de la moyenne
-        self.average_rate = sum(self.ratings) / len(self.ratings)
-        return self.average_rate
-        
-    def add_rating(self, rating: int) -> None:
-        """Ajoute une note à la liste et met à jour la note moyenne.
-        
-        Paramètres:
-        -----------
-        rating : int
-            La note à ajouter (doit être comprise entre 1 et 10)."""
-        
-        # Vérifie que la note est comprise entre 1 et 10
-        if 1 <= rating <= 10:
-            self.ratings.append(rating)
-            self.calculation_mean()
-        else:
-            raise ValueError("la note doit etre comprise entre 1 et 10")

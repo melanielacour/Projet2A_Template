@@ -11,8 +11,6 @@ class Film(BaseModel):
     producer: str
     category: str
     date: str
-    average_rate: float = 0.0
-    ratings: list[int] = []
 
 # Instanciation du service (assurez-vous d'avoir un service approprié)
 service = MovieService()
