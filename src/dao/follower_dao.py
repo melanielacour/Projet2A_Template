@@ -145,7 +145,7 @@ class FollowerDao:
         Return :
         --------
 
-         :list
+         :dict
             La watchlist de l'éclaireur demandé
         """
 
