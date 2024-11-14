@@ -70,3 +70,11 @@ async def delete_comment(id_film: int, id_user: int = Depends(get_current_user))
 @review_router.get("/reviews/average_rating/{id_film}")
 async def get_average_rating(id_film: int):
     return {"average_rating": review_service.get_average_rating(id_film)}
+
+@review_router.get("/reviews/review/{id_film}")
+async def get_average_rating(id_film: int):
+    return review_service.get_reviews_by_film_id(id_film)
+
+@review_router.get("/reviews/review/{id_user}")
+async def get_average_rating(id_user: int, id_user2: int= Depends(get_current_user)):
+    return review_service.get_reviews_by_user_id(id_user)

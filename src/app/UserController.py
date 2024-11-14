@@ -10,6 +10,7 @@ from src.app.init_app import jwt_service, user_repo, user_service
 from src.app.JWTBearer import JWTBearer
 from pydantic import BaseModel
 from src.app.dependencies import get_current_user
+from src.Model.User import User
 
 
 # Instanciation des services
@@ -73,5 +74,19 @@ async def demote_scout(user_id: int = Depends(get_current_user)):
         return {"message": message}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@user_router.get("/user/get-user-by-pseudo")
+async def get_user_by_user_pseudo(pseudo: str, user_id2:int= Depends(get_current_user)):
+    user=user_dao.get_by_username(pseudo)
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return pseudo, user.id
+
+@user_router.get("/user/get-user-by-id")
+async def get_user_by_user_pseudo(id: int, user_id2:int= Depends(get_current_user)):
+    user=user_dao.get_by_id(id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return id, user.username
 
 

@@ -15,7 +15,7 @@ class UserMovieDao:
         self.db_connection = db_connection
 
     def add_movie(self, id_user, id_film, status):
-         """
+        """
         Méthode qui ajoute une relation entre un utilisateur et un film, ou
         met à jour le statut si cette relation existe déjà.
 

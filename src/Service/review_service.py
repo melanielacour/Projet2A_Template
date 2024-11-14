@@ -89,3 +89,20 @@ class ReviewService:
             if not movie2:
                 raise ValueError("Échec de l'ajout du film dans la base données")
         return self.search_and_rate_movie_existing_movie(movie.id_local, id_user, note, comment)
+
+    def get_reviews_by_film_id(self, id_film: int):
+        """Récupère toutes les critiques d'un film donné par son identifiant."""
+        review=self.review_dao.get_all_review_by_id(id_film)
+        if not review:
+            raise ValueError("Pas de commentaires pour ce film")
+        return review
+
+
+
+    def get_reviews_by_user_id(self, id_user: int):
+        """Récupère toutes les critiques d'un utilisateur donné par son identifiant."""
+        return self.review_dao.get_all_reviews_by_user_id(id_user)
+
+    def get_review_by_user_and_film_id(self, id_user: int, id_film: int):
+        """Récupère une critique spécifique d'un utilisateur donné pour un film donné."""
+        return self.review_dao.get_review_by_id_user_and_id_film(id_film, id_user)

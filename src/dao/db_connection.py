@@ -28,16 +28,13 @@ class DBConnection:
             self.database = os.environ["DATABASE"]
             self.user = os.environ["USER"]
             self.password = os.environ["PASSWORD"]
-        user=self.user,
-            password=self.password,
-            options=f"-c search_path={self.schema}",
-            cursor_factory=RealDictCursor,
-        )
-    self.schema = os.environ["SCHEMA"]
+            self.schema = os.environ["SCHEMA"]
 
     def connection(self):
         return psycopg2.connect(
             host=self.host,
             port=self.port,
             database=self.database,
+            password=self.password,
+            schema=self.schema)
             
