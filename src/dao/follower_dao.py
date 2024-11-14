@@ -132,7 +132,7 @@ class FollowerDao:
 
     def get_watchlist_of_scouts(self, id_follower, id_scout):
         """
-        Récupère la watchlist de tous les éclaireurs suivis par un utilisateur
+        Récupère la watchlist d'un éclaireurs suivi par un utilisateur
 
         Attributs:
         ----------
@@ -145,7 +145,7 @@ class FollowerDao:
         Return :
         --------
 
-         :list
+         :dict
             La watchlist de l'éclaireur demandé
         """
 
