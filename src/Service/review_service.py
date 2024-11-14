@@ -1,9 +1,12 @@
-import os 
+import os
+
+from dotenv import load_dotenv
+
 from src.dao.db_connection import DBConnection
+from src.dao.movie_local import MovieRepo
 from src.dao.review_dao import ReviewDao
 from src.Model.Review import Review
-from src.dao.movie_local import MovieRepo
-from dotenv import load_dotenv
+
 load_dotenv()
 
 class ReviewService:
@@ -15,7 +18,7 @@ class ReviewService:
         movie = MovieRepo(DBConnection()).get_movie_by_id_film(id_film)
         if not movie:
             raise ValueError("Identifiant de film incorrect")
-        
+
         existing_review = self.review_dao.get_review_by_id_user_and_id_film(id_film, id_user)
         if existing_review:
             existing_review.note = note
@@ -64,7 +67,7 @@ class ReviewService:
             raise ValueError("Vous n'avez ni commenté ni noté ce film")
         if not existing_review.note:
             return self.delete_review(id_film=id_film, id_user=id_user)
-        return self.update_comment(id_film=id_film,id_user=id_user,comment=None)   
+        return self.update_comment(id_film=id_film,id_user=id_user,comment=None)
 
     def get_average_rating(self, id_film):
         """
@@ -85,5 +88,4 @@ class ReviewService:
             movie = MovieRepo(DBConnection()).get_movie_by_tmdb_id(id_tmdb)
             if not movie2:
                 raise ValueError("Échec de l'ajout du film dans la base données")
-        return self.search_and_rate_movie_existing_movie(movie.id_local, id_user, note, comment)    
-
+        return self.search_and_rate_movie_existing_movie(movie.id_local, id_user, note, comment)

@@ -11,6 +11,17 @@ TMDB_API_KEY = "7a35bd001639903f5c830e88dd86ed30"
 
 class MovieService:
     def get_category_id(self, category_name: str):
+        """ Méthode qui convertit une str de catégorie en son identifiant TMDB
+
+        Parameters
+        ----------
+        category_name : str
+                    le genre du film
+
+        Returns
+        -------
+        l'identifiant du genre
+        """
         categories = {
             "action": 28,
             "aventure": 12,
@@ -34,6 +45,19 @@ class MovieService:
         return categories.get(category_name.lower())
 
     def get_movie_by_id(self, id: str) -> Movie:
+        """
+        Méthode qui récupère un film à partir de son identifiant sur TMDB.
+
+        Parameters
+        ----------
+            id : str
+                 L'identifiant TMDB du film.
+
+        Returns
+        -------
+            Movie: Une instance de Movie.
+        """
+
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         details_url = f"https://api.themoviedb.org/3/movie/{id}?language=fr-FR"
         details_response = requests.get(details_url, headers=headers)
@@ -52,6 +76,18 @@ class MovieService:
             raise Exception(f"Erreur lors de la récupération des détails : {details_response.status_code}")
 
     def get_movie_by_title(self, title: str) -> list[Movie]:
+         """
+        Méthode qui récupère un film à partir de son titre.
+
+        Parameters
+        ----------
+            title :str
+                Le titre du film.
+
+        Returns
+        -------
+            Movie: Une instance de Movie.
+        """
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         search_url = f"https://api.themoviedb.org/3/search/movie?query={title}&language=fr-FR&page=1"
         search_response = requests.get(search_url, headers=headers)
@@ -85,6 +121,18 @@ class MovieService:
             raise Exception(f"Erreur lors de la recherche : {search_response.status_code}")
 
     def get_movies_by_category(self, category_id: int):
+        """
+        Méthode qui récupère des films en fonction d'un genre.
+
+        Parameters
+        ----------
+            category_id : int
+                 L'identifiant du genre.
+
+        Returns
+        -------
+            Des instances de la classe Movie.
+        """
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         url = f"https://api.themoviedb.org/3/discover/movie?with_genres={category_id}&language=fr-FR"
         response = requests.get(url, headers=headers)
@@ -113,6 +161,18 @@ class MovieService:
             raise Exception(f"Erreur lors de la récupération des films par catégorie : {response.status_code}")
 
     def get_movies_by_director(self, director_id: int):
+        """
+        Méthode qui récupère des films à partir de leur réalisateur.
+
+        Parameters
+        ----------
+            director_id : int
+                 L'identifiant du réalisateur.
+
+        Returns
+        -------
+            Des instances de la classe Movie.
+        """
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         url = f"https://api.themoviedb.org/3/discover/movie?with_crew={director_id}&language=fr-FR"
         response = requests.get(url, headers=headers)
@@ -141,6 +201,18 @@ class MovieService:
             raise Exception(f"Erreur lors de la récupération des films par réalisateur : {response.status_code} - {response.text}")
 
     def get_movies_by_director_name(self, director_name: str):
+         """
+        Méthode qui récupère des films à partir du nom de leur réalisateur.
+
+        Parameters
+        ----------
+            director_name : str
+                 Le nom du réalisateur.
+
+        Returns
+        -------
+            Des instances de la classe Movie.
+        """
         headers = {"Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"}
         search_url = f"https://api.themoviedb.org/3/search/person?query={director_name}&language=fr-FR"
         search_response = requests.get(search_url, headers=headers)

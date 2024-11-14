@@ -3,15 +3,20 @@ import os
 from dotenv import load_dotenv
 
 from src.dao.db_connection import DBConnection
+from src.dao.follower_dao import FollowerDao
+from src.dao.review_dao import ReviewDao
 from src.dao.user_repo import UserRepo
 from src.Service.JWTService import JwtService
 from src.Service.PasswordService import PasswordService
-from src.dao.review_dao import ReviewDao
-from src.dao.follower_dao import FollowerDao
 
 load_dotenv()
 
 class UserService:
+    """
+    Cette classe gère l'inscription, la connexion, la mise à jour des informations utilisateur, et la gestion des statuts d'éclaireur,
+    en assurant la validation des identifiants et la sécurité des mots de passe.
+    """
+
     def __init__(self):
         self.user_repo = UserRepo(DBConnection())
         self.password_service = PasswordService()
