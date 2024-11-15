@@ -8,9 +8,7 @@ class ValidationError(Exception):
 class Movie:
     """
     Cette classe représente un film avec ses attributs (identifiant,
-    titre, réalisateur, genre, date, etc.). Elle est utilisée pour gérer
-    les films dans l’application, qu’il s’agisse de films recherchés, notés
-    ou commentés par les utilisateurs.
+    titre, réalisateur, genre, date, etc.). 
 
     Attributs:
     ----------

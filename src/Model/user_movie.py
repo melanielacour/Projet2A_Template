@@ -29,6 +29,12 @@ class UserMovie:
         status : str
             Le statut de la relation entre l'utilisateur et le film.
         """
+        if not isinstance(id_user, int):
+            raise TypeError("id_user doit être un entier")
+        if not isinstance(id_film, int):
+            raise TypeError("id_film doit être un entier")
+        if status not in ["watched", "to watch"]:
+            raise ValueError(" Statut incorrect")       
         self.id_user = id_user
         self.id_film = id_film
         self.status = status
