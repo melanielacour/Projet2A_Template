@@ -1,23 +1,21 @@
 from src.dao.db_connection import DBConnection
-from src.Model.Movie import Movie
 from src.Model.Review import Review
 from src.utils.singleton import Singleton
 
+class ReviewDao:
+    def __init__(self, db_connection: DBConnection):
+        self.db_connection = db_connection
 
-class ReviewDao(metaclass=Singleton):
     def get_all_review_by_id(self, id_film):
-        with DBConnection().connection as connection:
-            with connection.cursor() as cursor:
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
                 cursor.execute(
-                    "SELECT *                       "
-                    "FROM projet_2a.review          "
-                    "WHERE id_film = %(id_film)s;        ",
+                    "SELECT * FROM projet_2a.review WHERE id_film = %(id_film)s;",
                     {"id_film": id_film}
                 )
                 res = cursor.fetchall()
 
         liste_review = []
-
         for row in res:
             review1 = Review(
                 id_review=row["id_review"],
@@ -28,20 +26,28 @@ class ReviewDao(metaclass=Singleton):
             )
             liste_review.append(review1)
 
-        return liste_review  # C'est ici que la liste devrait être retournée
+        return liste_review
 
     def get_all_review_by_title(self, title):
-        with DBConnection().connection as connection:
-            with connection.cursor() as cursor:
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
                 cursor.execute(
+<<<<<<< HEAD
                     "SELECT * FROM projet_2a.film                       "
                     "JOIN projet_2a.review ON review.id_film = film.id "
                     "WHERE film.title = %(title)s;                     ",
+=======
+                    """
+                    SELECT review.* FROM projet_2a.film
+                    JOIN projet_2a.review ON review.id_film = film.id
+                    WHERE film.title = %(title)s;
+                    """,
+>>>>>>> 115b50c504ede57b45697406a08be1be209e2db3
                     {"title": title}
                 )
-            res = cursor.fetchall()
-        liste_review = []
+                res = cursor.fetchall()
 
+        liste_review = []
         for row in res:
             review1 = Review(
                 id_review=row["id_review"],
@@ -49,99 +55,117 @@ class ReviewDao(metaclass=Singleton):
                 id_user=row["id_user"],
                 comment=row["comment"],
                 note=row["rating"]
+<<<<<<< HEAD
                 )
+=======
+            )
+>>>>>>> 115b50c504ede57b45697406a08be1be209e2db3
             liste_review.append(review1)
-            return liste_review
-    
-    def get_review_by_id_user_and_id_film(self,id_film,id_user):
-        with DBConnection().connection as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT *                       "
-                    "FROM projet_2a.review          "
-                    "WHERE id_user = %(id_user)s    "
-                    "   AND id_film =  %(id_film)s; ",
-                    {
-                        "id_user": id_user,
-                        "id_film": id_film
-                    },
 
+        return liste_review
+
+    def get_review_by_id_user_and_id_film(self, id_film, id_user):
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM projet_2a.review WHERE id_user = %(id_user)s AND id_film = %(id_film)s;",
+                    {"id_user": id_user, "id_film": id_film}
                 )
-                res=cursor.fetchone()
+                res = cursor.fetchone()
 
         if res:
-            rev=Review(
+            return Review(
                 id_review=res["id_review"],
                 id_film=res["id_film"],
-                id_user= res["id_user"],
+                id_user=res["id_user"],
                 note=res["rating"],
                 comment=res["comment"]
-
             )
-            return rev
+        return None
 
-
-
-    def add_review(self,review: Review):
-        """
-        Ajoute une critique au dictionnaire des critiques.
-
-        Paramètres:
-        -----------
-        review_text : str
-            Le texte de la critique à ajouter.
-        """
-        id_user= review.id_user
-        id_film= review.id_film
-        comment= review.comment
-        note= review.note
-        if not self.get_review_by_id_user_and_id_film(id_user=id_user,id_film=id_film):
-
-            with DBConnection().connection as connection:
-                with connection.cursor() as cursor:
+    def add_review(self, review: Review):
+        if not self.get_review_by_id_user_and_id_film(review.id_film, review.id_user):
+            with self.db_connection.connection() as conn:
+                with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO projet_2a.review(id_film, id_user, rating, comment) "
-                        "VALUES (%(id_film)s, %(id_user)s,%(note)s, %(comment)s)         "
-                        "RETURNING id_review;                                            ",
+                        """
+                        INSERT INTO projet_2a.review (id_film, id_user, rating, comment)
+                        VALUES (%(id_film)s, %(id_user)s, %(note)s, %(comment)s)
+                        RETURNING id_review;
+                        """,
                         {
-                            "id_user": id_user,
-                            "id_film": id_film,
-                            "comment": comment,
-                            "note": note
+                            "id_user": review.id_user,
+                            "id_film": review.id_film,
+                            "comment": review.comment,
+                            "note": review.note
                         },
                     )
                     res1 = cursor.fetchone()
 
             if res1:
-                rev = Review(
+                return Review(
                     id_review=res1["id_review"],
-                    id_user=id_user,
-                    id_film=id_film,
-                    comment=comment,
-                    note=note
+                    id_user=review.id_user,
+                    id_film=review.id_film,
+                    comment=review.comment,
+                    note=review.note
                 )
-                return rev
             return False
-        raise ValueError("Vous avez déja commenté ce film")
+        raise ValueError("Vous avez déjà commenté ce film.")
 
     def delete_review(self, id_user, id_film):
-        """
-        Supprime la critique du dictionnaire des critiques.
-        Retourne True si la suppression a été effectuée, False sinon.
-        """
-        rev = self.get_review_by_id_user_and_id_film(id_user, id_film)
+        rev = self.get_review_by_id_user_and_id_film(id_film, id_user)
         if rev:
-            with DBConnection().connection as connection:
-                with connection.cursor() as cursor:
+            with self.db_connection.connection() as conn:
+                with conn.cursor() as cursor:
                     cursor.execute(
-                        "DELETE FROM projet_2a.review  "
-                        "WHERE id_user = %(id_user)s   "
-                        "AND id_film = %(id_film)s;    ",
-                        {
-                            "id_user": id_user,
-                            "id_film": id_film
-                        },
+                        "DELETE FROM projet_2a.review WHERE id_user = %(id_user)s AND id_film = %(id_film)s;",
+                        {"id_user": id_user, "id_film": id_film}
                     )
-            return True  # Suppression réussie
-        return False  # La critique n'a pas été trouvée
+            return True
+        return False
 
+    def update_review(self, review: Review):
+        """
+        Met à jour une critique existante dans la base de données.
+        """
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    UPDATE projet_2a.review
+                    SET rating = %(note)s, comment = %(comment)s
+                    WHERE id_review = %(id_review)s;
+                    """,
+                    {
+                        "note": review.note,
+                        "comment": review.comment,
+                        "id_review": review.id_review
+                    }
+                )
+        return review
+
+    def get_all_reviews_by_user_id(self, user_id):
+        with self.db_connection.connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT * FROM projet_2a.review
+                    WHERE review.id_user = %(user_id)s;
+                    """,
+                    {"user_id": user_id}
+                )
+                res = cursor.fetchall()
+
+        liste_review = []
+        for row in res:
+            review1 = Review(
+                id_review=row["id_review"],
+                id_film=row["id_film"],
+                id_user=row["id_user"],
+                comment=row["comment"],
+                note=row["rating"]
+            )
+            liste_review.append(review1)
+
+        return liste_review

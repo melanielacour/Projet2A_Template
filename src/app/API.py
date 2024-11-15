@@ -1,15 +1,26 @@
 import uvicorn
 from fastapi import FastAPI
 
-from .MovieController import movie_router
-from .UserController import user_router
-
+from src.app.MovieController import movie_router
+from src.app.UserController import user_router
+from src.app.review_controller import review_router
+from src.app.user_movie_controller import usermovie_router
+from src.app.scout_controller import scout_router
+from src.app.movie_local_controller import movielocal_router
 
 def run_app():
-    app = FastAPI(title="Popcorn Critic", description="Le réseau social pour les cinéphiles")
+    app = FastAPI(title="Popcorn Critic", description="Trouvez vos films préférés en un clic !")
+    
+    app.include_router(movie_router)
+
+    app.include_router(movielocal_router)
 
     app.include_router(user_router)
 
-    app.include_router(movie_router)
+    app.include_router(review_router)
+
+    app.include_router(usermovie_router)
+
+    app.include_router(scout_router)
 
     uvicorn.run(app, port=8000, host="localhost")

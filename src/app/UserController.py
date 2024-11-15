@@ -2,63 +2,91 @@ from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
-
+from src.dao.db_connection import DBConnection
 from src.Model.APIUser import APIUser
 from src.Model.JWTResponse import JWTResponse
-from src.Service.PasswordService import (check_password_strength,
-                                         validate_username_password)
+from src.Service.PasswordService import PasswordService
+from src.app.init_app import jwt_service, user_repo, user_service
+from src.app.JWTBearer import JWTBearer
+from pydantic import BaseModel
+from src.app.dependencies import get_current_user
+from src.Model.User import User
 
-from .init_app import jwt_service, user_repo, user_service
-from .JWTBearer import JWTBearer
 
-if TYPE_CHECKING:
-    from src.Model.User import User
+# Instanciation des services
+db_connection = DBConnection()
+user_dao = user_repo
+password_service = PasswordService()
 
+
+# Définir le routeur pour les utilisateurs
 user_router = APIRouter(prefix="/users", tags=["Users"])
 
+# Modèle Pydantic pour l'enregistrement des utilisateurs
+class UserRegistration(BaseModel):
+    pseudo: str
+    password: str
 
-@user_router.post("/", status_code=status.HTTP_201_CREATED)
-def create_user(username: str, password: str) -> APIUser:
-    """
-    Fait la validation du nom d'utilisateur et du mot de passe
-    """
+@user_router.post("/register")
+def register_user(pseudo: str, password: str):
+    return user_service.register_user(pseudo, password)
+
+@user_router.post("/login")
+def log_in(pseudo: str, password: str):
+    return user_service.log_in(pseudo, password)
+
+# Modèles pour la mise à jour du pseudo et du mot de passe
+class UpdatePseudoRequest(BaseModel):
+    new_pseudo: str
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@user_router.put("/user/update-pseudo")
+async def update_pseudo(request: UpdatePseudoRequest, user_id: int = Depends(get_current_user)):
     try:
-        check_password_strength(password=password)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Mot de passe trop faible") from Exception
+        message = user_service.update_pseudo(user_id=user_id, new_pseudo=request.new_pseudo)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@user_router.put("/user/update-password")
+async def update_password(request: UpdatePasswordRequest, user_id: int = Depends(get_current_user)):
     try:
-        user: User = user_service.create_user(username=username, password=password)
-    except Exception as error:
-        raise HTTPException(status_code=409, detail="Nom d'utilisateur déjà existant") from error
+        message = user_service.update_password(user_id=user_id, current_password=request.current_password, new_password=request.new_password)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    return APIUser(id=user.id, username=user.username)
-
-
-@user_router.post("/jwt", status_code=status.HTTP_201_CREATED)
-def login(username: str, password: str) -> JWTResponse:
-    """
-    Authentifie le nom d'utilisateur, le mot de passe et le jeton
-    """
+@user_router.put("/user/promote-to-scout")
+async def promote_to_scout(user_id: int = Depends(get_current_user)):
     try:
-        user = validate_username_password(username=username, password=password, user_repo=user_repo)
-    except Exception as error:
-        raise HTTPException(status_code=403, detail="Combinaison du mot de passe et du nom d'utilisateur incorrecte") from error
+        message = user_service.promote_to_scout(user_id=user_id)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    return jwt_service.encode_jwt(user.id)
+@user_router.put("/user/demote-scout")
+async def demote_scout(user_id: int = Depends(get_current_user)):
+    try:
+        message = user_service.demote_scout(user_id=user_id)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-
-@user_router.get("/me", dependencies=[Depends(JWTBearer())])
-def get_user_own_profile(credentials: Annotated[HTTPAuthorizationCredentials, Depends(JWTBearer())]) -> APIUser:
-    """
-    Obtiens le profil authentifié
-    """
-    return get_user_from_credentials(credentials)
-
-
-def get_user_from_credentials(credentials: HTTPAuthorizationCredentials) -> APIUser:
-    token = credentials.credentials
-    user_id = int(jwt_service.validate_user_jwt(token))
-    user: User | None = user_repo.get_by_id(user_id)
+@user_router.get("/user/get-user-by-pseudo")
+async def get_user_by_user_pseudo(pseudo: str, user_id2:int= Depends(get_current_user)):
+    user=user_dao.get_by_username(pseudo)
     if not user:
-        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
-    return APIUser(id=user.id, username=user.username)
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return pseudo, user.id
+
+@user_router.get("/user/get-user-by-id")
+async def get_user_by_user_pseudo(id: int, user_id2:int= Depends(get_current_user)):
+    user=user_dao.get_by_id(id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return id, user.username
+
+

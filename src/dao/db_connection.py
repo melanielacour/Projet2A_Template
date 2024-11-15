@@ -1,32 +1,42 @@
 import os
-import sys
+from typing import Literal, Optional, Union
 
-import dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from src.utils.singleton import Singleton
 
+class DBConnection:
+    """
+    La classe permettant de gérer la connexion
+    avec la base de données locale PostgreSQL.
 
-class DBConnection(metaclass=Singleton):
+    Attributs :
+    -----------
+
     """
-    Une classe technique pour se connecter avec la base de données
-    """
-    def __init__(self):
-        dotenv.load_dotenv(override=True)
-        # Ouvrir la connexion grâce au .env
-        self.__connection = psycopg2.connect(
-            host=os.environ["HOST"],
-            port=os.environ["PORT"],
-            database=os.environ["DATABASE"],
-            user=os.environ["USER"],
-            password=os.environ["PASSWORD"],
+    def __init__(self, config=None):
+        if config is not None:
+            self.host = config["host"]
+            self.port = config["post"]
+            self.database = config["database"]
+            self.user = config["user"]
+            self.password = config["password"]
+            self.schema = config["schema"]
+        else:
+            self.host = os.environ["HOST"]
+            self.port = os.environ["PORT"]
+            self.database = os.environ["DATABASE"]
+            self.user = os.environ["USER"]
+            self.password = os.environ["PASSWORD"]
+            self.schema = os.environ["SCHEMA"]
+
+    def connection(self):
+        return psycopg2.connect(
+            host=self.host,
+            port=self.port,
+            database=self.database,
+            user=self.user,
+            password=self.password,
+            options=f"-c search_path={self.schema}",
             cursor_factory=RealDictCursor,
         )
-
-    @property
-    def connection(self):
-        """
-        Retourne la connexion ouverte
-        """
-        return self.__connection
