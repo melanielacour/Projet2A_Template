@@ -1,6 +1,7 @@
-import random
+import os
 
 from src.dao.user_dao import UserDao
+from src.Service.JWTService import JwtService
 from src.Service.PasswordService import PasswordService
 
 
@@ -56,7 +57,7 @@ class UserService:
 
 
 
-    def log_in(self, pseudo: str, password: str) -> bool:
+    def log_in(self, pseudo: str, password: str) -> dict:
 
     # Récupérer l'utilisateur par son pseudo
         user = UserDao().get_user_by_pseudo(pseudo)
@@ -83,12 +84,21 @@ class UserService:
         # On Vérifie si l'utilisateur existe et si le mot de passe fourni est correct.
         if not user:
             raise ValueError("Identifiant incorrect.")
-        # Vérifier si le mot de passe correspond
+        # Vérifier si le mot de passe correspond au pseudo
         if not PasswordService().validate_pseudo_password(pseudo, password):  # Utiliser validate_password pour comparer
             raise ValueError("Mot de passe incorrect.")
+<<<<<<< HEAD
         # On retourne True si l'authentification est réussie donc si le l'utilisateur est bien inscrit.
         return True
 <<<<<<< HEAD
 =======
 
 >>>>>>> 455843ac32d54422f97696732b59958562669d89
+=======
+
+        # générer un token JWT
+        jwt_response = JwtService(os.environ["JWT_SECRET"], "HS256").encode_jwt(user.id_user)
+
+        # Retourner la réponse avec True et le token
+        return {"success": True, "token": jwt_response.access_token}
+>>>>>>> ee77daef1f0eba5d0dad5d81977816770759b696

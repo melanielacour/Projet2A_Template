@@ -80,13 +80,9 @@ class ReviewDao(metaclass=Singleton):
             )
             return rev
 
-<<<<<<< HEAD
-    def add_comment(self, review: Review):
-=======
 
 
     def add_review(self,review: Review):
->>>>>>> 455843ac32d54422f97696732b59958562669d89
         """
         Ajoute une critique au dictionnaire des critiques.
 
@@ -128,22 +124,7 @@ class ReviewDao(metaclass=Singleton):
             return False
         raise ValueError("Vous avez déja commenté ce film")
 
-<<<<<<< HEAD
-        if res1:
-            rev = Review(
-                id_review=res1["id_review"],
-                id_user=id_user,
-                id_film=id_film,
-                comment=comment,
-                note=note
-            )
-            return rev
-        return False
-
-    def delete_review(self, review):
-=======
     def delete_review(self, id_user, id_film):
->>>>>>> 455843ac32d54422f97696732b59958562669d89
         """
         Supprime la critique du dictionnaire des critiques.
         Retourne True si la suppression a été effectuée, False sinon.
