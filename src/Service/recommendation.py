@@ -1,132 +1,92 @@
-import json
-
-import pandas as pd
+import requests
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import MultiLabelBinarizer
+import numpy as np
 
-from src.Model.Movie import Movie
+# Récupérer les genres disponibles depuis TMDB
+def get_tmdb_genres(api_key):
+    url = f"https://api.themoviedb.org/3/genre/movie/list?api_key={api_key}&language=en-US"
+    response = requests.get(url)
+    genres = response.json().get('genres', [])
+    genre_ids = [genre['id'] for genre in genres]
+    genre_names = [genre['name'] for genre in genres]
+    return genre_ids, genre_names
 
+# Récupérer les films depuis TMDB (avec gestion de la pagination)
+def get_tmdb_movies(api_key, num_movies=100):
+    movies = []
+    page = 1
+    while len(movies) < num_movies:
+        url = f"https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=en-US&page={page}"
+        response = requests.get(url)
+        data = response.json()
 
-def json_to_dataframe(movies_json):
-    """
-    Transforme le fichier JSON en DataFrame avec les colonnes title, producer et date.
+        # Vérifier si 'results' est présent dans la réponse
+        if 'results' not in data:
+            print(f"Erreur : La réponse de l'API ne contient pas la clé 'results'. Réponse obtenue : {data}")
+            return []
 
-    Parametres:
-    -----------
-    movies_json : fichier json
-        fichier contenant des films avec comme clés title, producer et date.
+        movies.extend(data['results'])
+        page += 1
+        if len(data['results']) == 0:  # Si la page est vide, arrêter
+            break
 
-    Returns:
-    --------
-    movies_df : dataframe
-        dataframe pandas obtenu à partir du fichier json.
-    """
-    # Charger le JSON en tant que liste de dictionnaires
-    data = json.loads(movies_json)
+    # Limiter la liste à `num_movies` si nécessaire
+    movies = movies[:num_movies]
+    
+    # Afficher les 5 premiers films pour vérification
+    print("Voici les 5 premiers films chargés :")
+    for movie in movies[:5]:
+        print(f"{movie['title']} ({movie['id']})")
+    
+    print(f"{len(movies)} films ont été chargés avec succès.")
+    return movies
 
-    # Transformer en DataFrame
-    movies_df = pd.DataFrame(data)
+# Calcul de la similarité entre les genres
+def calculate_similarity(movies, all_genres):
+    # Créer une matrice des genres des films
+    genre_matrix = []
+    for movie in movies:
+        genres = movie['genre_ids']
+        genre_vector = [1 if genre in genres else 0 for genre in all_genres]
+        genre_matrix.append(genre_vector)
+    
+    # Calcul de la similarité cosinus
+    similarity_matrix = cosine_similarity(genre_matrix)
+    return similarity_matrix
 
-    return movies_df
+# Recommander des films basés sur la similarité
+def recommend_movies(movies, similarity_matrix, movie_id, top_n=5):
+    # Vérifier si movie_id existe dans la liste
+    try:
+        idx = next(i for i, movie in enumerate(movies) if movie['id'] == movie_id)
+    except StopIteration:
+        print(f"Le film avec l'ID {movie_id} n'a pas été trouvé.")
+        return []
 
+    similarities = similarity_matrix[idx]
+    
+    # Classer les films en fonction de la similarité
+    similar_indices = similarities.argsort()[-top_n-1:-1][::-1]
+    recommended_movies = [movies[i] for i in similar_indices]
+    
+    return recommended_movies
 
-def classification(movies_json):
-    '''
-    Effectue une classification pour obtenir un dataframe des similarités entre chaque films.
+# Exemple d'utilisation
+api_key = "ton_api_key"  # Remplace avec ta clé API TMDB
+movies = get_tmdb_movies(api_key)
 
-    Parametres:
-    -----------
-    movies_json : fichier json
-        fichier contenant des films avec comme clés title, producer et date.
+# Récupérer les genres disponibles
+if movies:
+    genre_ids, genre_names = get_tmdb_genres(api_key)
 
-    Returns:
-    --------
-    similarity_df : dataframe
-        dataframe des imilarités entre chaque film.
+    # Calcul de la similarité entre les genres
+    similarity_matrix = calculate_similarity(movies, genre_ids)
 
-    '''
-    # Il est nécessaire de de convertir la base_movies en dictionnaire
-    # pour faciliter la classification
-    movies_df = json_to_dataframe(movies_json)
+    # Recommander des films basés sur un ID de film spécifique (par exemple, movie_id=1)
+    movie_id = 1  # Remplace par l'ID du film pour lequel tu veux des recommandations
+    recommended_movies = recommend_movies(movies, similarity_matrix, movie_id)
 
-    # Ensuite, nous initialisons une variable chargée de l'encodage des
-    # variables catégorielles (dans notre cas, title, producer et date).
-    # Cette méthode permet de transformer les modalités en format binaire.
-    mlb = MultiLabelBinarizer()
-
-    # Encodage des catégories (genres)
-    category_encoded = pd.DataFrame(mlb.fit_transform(movies_df['category']),
-                                    columns=mlb.classes_,
-                                    index=movies_df.index)
-
-    # Encodage des producteurs
-    producer_encoded = pd.DataFrame(mlb.fit_transform(movies_df['producer']),
-                                    columns=mlb.classes_,
-                                    index=movies_df.index)
-
-    # Encodage des dates puisqu'elles sont mises en année, ce qui permet de les regrouper plus facilement
-    date_encoded = pd.get_dummies(movies_df['date'])
-
-    # Combiner toutes les colonnes encodées dans un DataFrame final
-    movies_encoded = pd.concat([movies_df['title'], category_encoded, producer_encoded, date_encoded], axis=1)
-
-    # Après avoir fait ces manipulations avec MultiLabelBinarizer,
-    # nous nous retrouvons avec un pd.DataFrame contenant uniquement des
-    # variables numériques. Les variables catégorielles ont été coupé, et les
-    # modalités sont devenues des variables. Les valeurs de ces nouvelles
-    # variables sont soit 0 si l'individu n'avait pas la modalité, soit dans
-    # le cas contraire 1. Il s'agit d'un dérivé de la méthode OneHotEncoder,
-    # seulement certaines variables étaient des listes, donc des individus
-    # pouvaient avoir plusieurs modalités différentes pour une même variable.
-
-    # Extraire les colonnes encodées sans le titre pour calculer la similarité
-    features = movies_encoded.drop(columns=['title'])
-
-    # Calculer la similarité entre tous les films. La similarité
-    # entre les séries s'effectueront en calculant le cosinus de l'angle
-    # entre les deux vecteurs (donc les deux séries).
-    similarity_matrix = cosine_similarity(features)
-
-    # Mettre la similarité dans un DataFrame pour une meilleure lisibilité
-    similarity_df = pd.DataFrame(similarity_matrix, index=movies_encoded['title'], columns=movies_encoded['title'])
-
-    return similarity_df
-
-
-def recommend_movies(movie_title, movies_json, n=10):
-    '''
-    Renvoie la liste de recommendations des n films avec le plus gros score de similarités.
-
-    Parametres:
-    -----------
-    movies_json : fichier json
-        fichier contenant des films avec comme clés title, producer et date.
-    movie_title : str
-        titre du film à partir duquel on va chercher une recommandation.
-    n : int
-        nombre de films similaires que l'ont veut recommander
-
-    Returns:
-    --------
-    recommandations : list
-        liste des n films ayant le plus grand score de similarité.
-
-    '''
-    similarity_df = classification(movies_json)
-
-    # Obtenir les similarités pour le film donné
-    similarity_scores = similarity_df[movie_title]
-
-    # Trier les films par similarité (du plus similaire au moins similaire)
-    similarity_scores_desc = similarity_scores.sort_values(ascending=False)
-
-    # Exclure le film lui-même de la liste
-    similarity_scores_desc = similarity_scores_desc.drop(movie_title)
-
-    # Prends les n meilleures recommandations après le tri et l'exclusion du film lui même
-    recommendations = similarity_scores_desc.head(n).index.tolist()
-
-    return recommendations
-
-##print("Films recommandés pour 'Movie 1' :", recommendations)
-
+    # Afficher les films recommandés
+    print("Films recommandés :")
+    for movie in recommended_movies:
+        print(f"{movie['title']} ({movie['id']})")

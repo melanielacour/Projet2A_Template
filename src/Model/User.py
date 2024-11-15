@@ -29,8 +29,6 @@ class User:
             raise ValidationError("id must be an integer")
         if not isinstance(username, str):
             raise ValidationError("username must be a string")
-        if not isinstance(salt, str):
-            raise ValidationError("salt must be a string")
         if not isinstance(password, str):
             raise ValidationError("password must be a string")
         if not isinstance(is_scout, bool):
