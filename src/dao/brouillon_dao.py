@@ -1,6 +1,7 @@
+import os
+
 from db_connection import DBConnection
 from dotenv import load_dotenv
-import os
 
 # Charger les variables d'environnement
 if __name__ == "__main__":

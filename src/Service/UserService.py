@@ -213,3 +213,4 @@ class UserService:
         for val in liste:
             res=FollowerDao(DBConnection).unfollow_scout(id_follower=val, id_scout=user_id)
         return "Votre statut éclaireur a été révoqué."
+

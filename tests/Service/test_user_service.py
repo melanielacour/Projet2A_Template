@@ -88,4 +88,25 @@ def test_log_in_incorrect_password(user_service):
 
     # Exécuter la méthode et vérifier l'exception
     with pytest.raises(ValueError, match="Mot de passe incorrect."):
+<<<<<<< HEAD
+        user_service.log_in(pseudo="existing_user", password="WrongPassword123") 
+
+    mock_user_dao.get_user_by_pseudo.assert_called_once_with("existing_user")
+    mock_password_service.validate_password.assert_called_once_with("WrongPassword123", "ValidPassword123")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=======
         user_service.log_in(pseudo, password)
+>>>>>>> 115b50c504ede57b45697406a08be1be209e2db3

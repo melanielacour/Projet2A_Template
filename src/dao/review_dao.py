@@ -2,6 +2,7 @@ from src.dao.db_connection import DBConnection
 from src.Model.Review import Review
 from src.utils.singleton import Singleton
 
+
 class ReviewDao:
     def __init__(self, db_connection: DBConnection):
         self.db_connection = db_connection
