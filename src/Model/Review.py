@@ -27,8 +27,6 @@ class Review:
             raise ValidationError("id_film must be an integer")
         if not isinstance(id_user, int):
             raise ValidationError("id_user must be an integer")
-        if not isinstance(id_review, int):
-            raise ValidationError("id_review must be an integer")
         if not isinstance(comment, str):
             raise ValidationError("comment must be a string")
         if not isinstance(note, int) or not (0 <= note <= 10):

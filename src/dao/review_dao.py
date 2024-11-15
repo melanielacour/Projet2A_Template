@@ -2,6 +2,7 @@ from src.dao.db_connection import DBConnection
 from src.Model.Review import Review
 from src.utils.singleton import Singleton
 
+
 class ReviewDao:
     def __init__(self, db_connection: DBConnection):
         self.db_connection = db_connection
@@ -32,17 +33,11 @@ class ReviewDao:
         with self.db_connection.connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-<<<<<<< HEAD
-                    "SELECT * FROM projet_2a.film                       "
-                    "JOIN projet_2a.review ON review.id_film = film.id "
-                    "WHERE film.title = %(title)s;                     ",
-=======
                     """
                     SELECT review.* FROM projet_2a.film
                     JOIN projet_2a.review ON review.id_film = film.id
                     WHERE film.title = %(title)s;
                     """,
->>>>>>> 115b50c504ede57b45697406a08be1be209e2db3
                     {"title": title}
                 )
                 res = cursor.fetchall()
@@ -55,11 +50,7 @@ class ReviewDao:
                 id_user=row["id_user"],
                 comment=row["comment"],
                 note=row["rating"]
-<<<<<<< HEAD
-                )
-=======
             )
->>>>>>> 115b50c504ede57b45697406a08be1be209e2db3
             liste_review.append(review1)
 
         return liste_review
