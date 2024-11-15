@@ -1,7 +1,11 @@
-from fastapi import APIRouter, HTTPException
 from typing import List
+
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from src.Service.MovieService import MovieService  # Assurez-vous d'importer votre service
+
+from src.Service.MovieService import \
+    MovieService  # Assurez-vous d'importer votre service
+
 
 # Modèle Pydantic pour les films
 class Film(BaseModel):
@@ -37,7 +41,7 @@ async def get_movies_by_category(category_name: str):
     category_id = service.get_category_id(category_name)
     if category_id is None:
         raise HTTPException(status_code=404, detail="Catégorie non trouvée.")
-    
+
     films = service.get_movies_by_category(category_id)
     return films
 
