@@ -8,7 +8,7 @@ from src.Model.User import User
 
 class UserRepo:
     """
-    Cette méthode permet de récupérer un utilisateur par ID ou pseudo, d'ajouter de nouveaux utilisateurs, de mettre à jour leur pseudo, mot de passe ou statut d'éclaireur. 
+    Cette méthode permet de récupérer un utilisateur par ID ou pseudo, d'ajouter de nouveaux utilisateurs, de mettre à jour leur pseudo, mot de passe ou statut d'éclaireur.
     """
 
     def __init__(self, db_connection: DBConnection):
@@ -33,7 +33,7 @@ class UserRepo:
             with connection.cursor() as cursor:
                 cursor.execute(query, {"user_id": user_id})
                 raw_user = cursor.fetchone()
-        
+
         if raw_user is None:
             return None
 
@@ -111,7 +111,7 @@ class UserRepo:
         -----------
         user_id : int
             L'identifiant de l'utilisateur dont on souhaite changer le pseudo.
-        
+
         new_pseudo : str:
             Le nouveau pseudo de l'utilisateur.
 
@@ -123,19 +123,19 @@ class UserRepo:
         query = "UPDATE users SET username = %(new_pseudo)s WHERE id = %(user_id)s"
         with self.db_connection.connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(query, {"new_pseudo":new_pseudo, "user_id" :user_id}) 
+                cursor.execute(query, {"new_pseudo":new_pseudo, "user_id" :user_id})
                 return cursor.rowcount > 0  # True si la mise à jour a réussi
 
     def update_password(self, user_id: int, hashed_password: str) -> bool:
 
         """
         Cette méthode permet de mettre à jour le mot de passe haché d'un utilisateur dans la base de données.
-        
+
         Paramètres:
         -----------
         user_id : int
             L'identifiant de l'utilisateur dont on souhaite changer le pseudo.
-        
+
         hashed_password : str:
             Le nouveau mot de passe haché de l'utilisateur.
 
@@ -160,7 +160,7 @@ class UserRepo:
         -----------
         user_id : int
             L'identifiant de l'utilisateur dont on souhaite changer le pseudo.
-        
+
         is_scout :bool
              Le nouveau statut de l'utilisateur.
 
@@ -171,8 +171,8 @@ class UserRepo:
         """
 
         query = "UPDATE users SET is_scout = %(is_scout)s WHERE id = %(user_id)s"
-        with self.db_connection as conn:
-            with conn.cursor() as cursor:
+        with self.db_connection.connection() as connection:
+            with connection.cursor() as cursor:
                 cursor.execute(query, {"is_scout": is_scout, "user_id" :user_id})
                 return cursor.rowcount > 0
 
