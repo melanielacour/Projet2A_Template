@@ -24,7 +24,7 @@ class MovieRepo:
                     return MovieSimple(id_local=row["id"], id_tmdb=row["id_tmdb"], title=row["title"])
                 return None
 
-    def list_movies(self) -> list[MovieSimple]:
+    def get_list_movies(self) -> list[MovieSimple]:
         with self.db_connection.connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT id, id_tmdb, title FROM film")

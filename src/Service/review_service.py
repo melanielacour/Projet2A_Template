@@ -58,9 +58,8 @@ class ReviewService:
         existing_review=self.review_dao.get_review_by_id_user_and_id_film(id_film,id_user)
         if not existing_review:
             raise ValueError("Vous n'avez ni commenté ni noté ce film")
-        if not existing_review.comment:
-            return self.delete_review(id_film=id_film, id_user=id_user)
-        return self.update_note(id_film=id_film,id_user=id_user,note=None)
+        return self.delete_review(id_film=id_film, id_user=id_user)
+
     def delete_comment(self, id_film,id_user):
         existing_review=self.review_dao.get_review_by_id_user_and_id_film(id_film,id_user)
         if not existing_review:

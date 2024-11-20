@@ -44,13 +44,13 @@ class MovieService:
         }
         return categories.get(category_name.lower())
 
-    def get_movie_by_id(self, id: str) -> Movie:
+    def get_movie_by_id(self, id: int) -> Movie:
         """
         Méthode qui récupère un film à partir de son identifiant sur TMDB.
 
         Parameters
         ----------
-            id : str
+            id : int
                  L'identifiant TMDB du film.
 
         Returns
@@ -105,6 +105,8 @@ class MovieService:
 
                 if details_response.status_code == 200:
                     details_data = details_response.json()
+                    if details_data["adult"]==True:
+                        raise ValueError("Les films de la catégorie adulte ne sont pas disponibles")
                     films.append(Movie(
                         id_film=details_data["id"],
                         id_tmdb=details_data["id"],

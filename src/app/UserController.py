@@ -29,11 +29,22 @@ class UserRegistration(BaseModel):
 
 @user_router.post("/register")
 def register_user(pseudo: str, password: str):
-    return user_service.register_user(pseudo, password)
+    try:
+        message = user_service.register_user(pseudo, password)
+        return {"message": message}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @user_router.post("/login")
 def log_in(pseudo: str, password: str):
-    return user_service.log_in(pseudo, password)
+    try:
+        message = user_service.log_in(pseudo, password)
+        return {"message": message}
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Modèles pour la mise à jour du pseudo et du mot de passe
 class UpdatePseudoRequest(BaseModel):
@@ -89,4 +100,13 @@ async def get_user_by_user_pseudo(id: int, user_id2:int= Depends(get_current_use
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     return id, user.username
 
+@user_router.get("/user/view profil")
+async def view_profil(user_id: int= Depends(get_current_user)):
+    user=user_service.view_profil(user_id)
+    res={"id": user.id, "pseudo": user.username, "is_scout": user.is_scout}
+    return res
+
+@user_router.delete("/user/delete_user")
+async def delete_user(user_id:int= Depends(get_current_user)):
+    return user_service.delete_profil(user_id)
 

@@ -214,3 +214,9 @@ class UserService:
             res=FollowerDao(DBConnection).unfollow_scout(id_follower=val, id_scout=user_id)
         return "Votre statut éclaireur a été révoqué."
 
+    def view_profil(self, user_id):
+        return self.user_repo.get_by_id(user_id)
+
+    def delete_profil(self, user_id):
+        return self.user_repo.delete_by_id(user_id)
+

@@ -80,3 +80,9 @@ def test_validate_user_jwt_invalid_token(jwt_service):
     """Test pour vérifier que validate_user_jwt lève InvalidTokenError pour un token incorrect."""
     with pytest.raises(InvalidTokenError):
         jwt_service.validate_user_jwt("invalid_token")
+def test_jwt_service_initialization_with_env_secret(monkeypatch):
+    """Test pour vérifier que JwtService utilise JWT_SECRET de l'environnement si aucun secret n'est fourni."""
+    monkeypatch.setenv("JWT_SECRET", "env_secret_value")
+    jwt_service = JwtService()
+    assert jwt_service.secret == "env_secret_value"
+

@@ -6,7 +6,7 @@ class RecommendationService:
         self.api_key = api_key
         self.access_token = access_token
         self.all_genres = self.get_tmdb_genres()
-        self.movies = self.get_tmdb_movies(100)
+        self.movies = self.get_tmdb_movies(1000)
         self.similarity_matrix = self.calculate_similarity()
 
     def get_tmdb_genres(self):
@@ -17,7 +17,7 @@ class RecommendationService:
         genre_ids = [genre['id'] for genre in genres]
         return genre_ids
 
-    def get_tmdb_movies(self, num_movies=100):
+    def get_tmdb_movies(self, num_movies=1000):
         movies = []
         page = 1
         headers = {"Authorization": f"Bearer {self.access_token}"}

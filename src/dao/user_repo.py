@@ -98,8 +98,9 @@ class UserRepo:
                     {"username": username, "salt": salt, "password": hashed_password}
                 )
                 raw_created_user = cursor.fetchone()
-
-        return User(**raw_created_user)
+        if raw_created_user:
+            return User(**raw_created_user)
+        return None
 
     def update_pseudo(self, user_id: int, new_pseudo: str) -> bool:
 
@@ -174,5 +175,30 @@ class UserRepo:
             with conn.cursor() as cursor:
                 cursor.execute(query, {"is_scout": is_scout, "user_id" :user_id})
                 return cursor.rowcount > 0
+
+    def delete_by_id(self, user_id: int) -> bool:
+        """
+        Cette méthode permet de supprimer un utilisateur de la base de données par son identifiant.
+
+        Paramètres:
+        -----------
+        user_id : int
+            L'identifiant de l'utilisateur à supprimer.
+
+        Retourne:
+        ---------
+        bool
+            True si la suppression a été effectuée avec succès, sinon False.
+        """
+        user=self.get_by_id(user_id)
+        if not user:
+            return False
+        query = "DELETE FROM users WHERE id = %(user_id)s"
+        with self.db_connection.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, {"user_id": user_id})
+                return cursor.rowcount > 0  
+
+
 
 
