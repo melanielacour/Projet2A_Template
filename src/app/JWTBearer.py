@@ -10,18 +10,26 @@ class JWTBearer(HTTPBearer):
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials:
-        credentials: HTTPAuthorizationCredentials | None = await super(JWTBearer, self).__call__(request)
+        credentials: HTTPAuthorizationCredentials | None = await super(
+            JWTBearer, self
+        ).__call__(request)
         if not credentials:
-            raise HTTPException(status_code=403, detail="Code d'authentification invalide.")
+            raise HTTPException(
+                status_code=403, detail="Code d'authentification invalide."
+            )
 
         if not credentials.scheme == "Bearer":
-            raise HTTPException(status_code=403, detail="Schéma d'authenficaition invalide.")
+            raise HTTPException(
+                status_code=403, detail="Schéma d'authenficaition invalide."
+            )
         try:
             jwt_service.validate_user_jwt(credentials.credentials)
         except ExpiredSignatureError as e:
             raise HTTPException(status_code=403, detail="Jeton expiré") from e
         except DecodeError as e:
-            raise HTTPException(status_code=403, detail="Erreur de décodage du jeton") from e
+            raise HTTPException(
+                status_code=403, detail="Erreur de décodage du jeton"
+            ) from e
         except Exception as e:
             raise HTTPException(status_code=403, detail="Erreur inconnue") from e
 

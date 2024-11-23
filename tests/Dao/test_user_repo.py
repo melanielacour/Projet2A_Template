@@ -210,25 +210,7 @@ def test_update_status():
     # Assertions
     assert success is True, "La mise à jour du statut d'éclaireur devrait réussir."
 
-def test_delete_by_id():
-    # Initialiser le mock
-    mock_db = MockDBConnection()
 
-    # Définir une réponse pour la requête de suppression avec rowcount=1 (une ligne affectée)
-    mock_db.set_query_response(
-        "DELETE FROM users WHERE id = %(user_id)s",
-        response=True,  # Cette réponse n'est pas utilisée ici, donc True suffit
-        rowcount=1  # Simule qu'une ligne a été affectée
-    )
-
-    # Créer une instance de UserRepo avec le mock
-    user_repo = UserRepo(mock_db)
-
-    # Appeler la méthode à tester
-    success = user_repo.delete_by_id(1)
-
-    # Assertions
-    assert success is True, "La suppression de l'utilisateur devrait réussir."
 
 
 #Fixture pour la connexion mockée

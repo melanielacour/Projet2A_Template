@@ -1,14 +1,16 @@
 # ################### Classe Movie ################################
 
+
 class ValidationError(Exception):
     """Cette classe lève une exception pour les erreurs de validation."""
+
     pass
 
 
 class Movie:
     """
     Cette classe représente un film avec ses attributs (identifiant,
-    titre, réalisateur, genre, date, etc.). 
+    titre, réalisateur, genre, date, etc.).
 
     Attributs:
     ----------
@@ -27,7 +29,10 @@ class Movie:
 
     """
 
-    def __init__(self, id_film, id_tmdb: int, title: str, producer: str, category: str, date: str):
+    def __init__(
+        self, id_film, id_tmdb: int, title: str,
+        producer: str, category: str, date: str
+    ):
         # Vérifie que id_film est un entier, sinon lève une ValidationError
         if not isinstance(id_film, int):
             try:
@@ -35,11 +40,13 @@ class Movie:
                 self.id_film = int(id_film)
                 # Ou lève une exeption si c'est impossible
             except ValueError:
-                raise ValueError("id_film must be an integer, unable to parse string as an integer")
+                raise ValueError(
+                    "id_film must be an integer, unable to parse string as"
+                    + " an integer"
+                )
         else:
-            self.id_film = id_film  # Si c'est déjà un entier, il l'assigne directement
+            self.id_film = id_film
 
-        # Vérifie que id_tmdb est un entier
         if not isinstance(id_tmdb, int):
             raise ValueError("id_tmdb must be an integer")
 
@@ -48,4 +55,3 @@ class Movie:
         self.producer = producer
         self.category = category
         self.date = date
-

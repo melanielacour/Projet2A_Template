@@ -2,17 +2,19 @@
 import os
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import HTTPException, Depends
-from jwt.exceptions import ExpiredSignatureError
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from src.Service.JWTService import JwtService
 from dotenv import load_dotenv
 
 load_dotenv()
-jwt_service=JwtService(os.environ["JWT_SECRET"], "HS256")
-security = HTTPBearer() 
+jwt_service = JwtService(os.environ["JWT_SECRET"], "HS256")
+security = HTTPBearer()
 
 
 # Fonction de dépendance pour valider le token
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
     token = credentials.credentials
     try:
         # Utilisez directement jwt_service pour valider le token

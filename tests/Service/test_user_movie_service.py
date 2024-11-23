@@ -3,6 +3,11 @@ from unittest.mock import MagicMock
 from src.Service.user_movie_service import UserMovieService
 from src.Model.user_movie import UserMovie
 
+import unittest
+from unittest.mock import MagicMock
+from src.Service.user_movie_service import UserMovieService
+from src.Model.user_movie import UserMovie
+
 class TestUserMovieService(unittest.TestCase):
     def setUp(self):
         # Mock du DAO
@@ -10,19 +15,29 @@ class TestUserMovieService(unittest.TestCase):
         self.user_movie_service = UserMovieService(self.user_movie_dao)
 
     def test_get_watchlist(self):
-        # Configurer le mock
+        # Configurer le mock pour simuler des résultats
         self.user_movie_dao.get_movies_by_user.return_value = [
-            UserMovie(1, 101, "to_watch"),
-            UserMovie(1, 102, "to_watch")
+            UserMovie(1, 101, "to watch"),
+            UserMovie(1, 102, "to watch"),
         ]
-
-        # Appeler la méthode
+    
+        # Appeler la méthode à tester
         watchlist = self.user_movie_service.get_watchlist(1)
+    
+        # Vérifier que la méthode DAO a été appelée avec les bons arguments
+        self.user_movie_dao.get_movies_by_user.assert_called_once_with(1, status="to watch")
 
-        # Vérifier le résultat
-        self.user_movie_dao.get_movies_by_user.assert_called_once_with(1, status="to_watch")
+        # Vérifier le nombre d'éléments dans la watchlist
         self.assertEqual(len(watchlist), 2)
+
+        # Vérifier les attributs des objets renvoyés
         self.assertEqual(watchlist[0].id_film, 101)
+        self.assertEqual(watchlist[0].status, "to watch")
+        self.assertIsInstance(watchlist[0], UserMovie)
+        self.assertEqual(watchlist[1].id_film, 102)
+        self.assertEqual(watchlist[1].status, "to watch")
+
+
 
     def test_get_seenlist(self):
         # Configurer le mock
@@ -44,7 +59,7 @@ class TestUserMovieService(unittest.TestCase):
         self.user_movie_service.add_movie_to_watchlist(1, 101)
 
         # Vérifier l'appel
-        self.user_movie_dao.add_movie.assert_called_once_with(1, 101, status="to_watch")
+        self.user_movie_dao.add_movie.assert_called_once_with(1, 101, status="to watch")
 
     def test_add_movie_to_seenlist(self):
         # Appeler la méthode
@@ -55,10 +70,10 @@ class TestUserMovieService(unittest.TestCase):
 
     def test_delete_movie_from_list(self):
         # Appeler la méthode
-        result = self.user_movie_service.delete_movie_from_list(1, 101, "to_watch")
+        result = self.user_movie_service.delete_movie_from_list(1, 101, "to watch")
 
         # Vérifier l'appel
-        self.user_movie_dao.delete_movie.assert_called_once_with(1, 101, "to_watch")
+        self.user_movie_dao.delete_movie.assert_called_once_with(1, 101, "to watch")
 
     def test_update_movie_status(self):
         # Appeler la méthode pour mettre à jour le statut

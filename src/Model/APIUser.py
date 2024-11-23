@@ -14,5 +14,6 @@ class APIUser(BaseModel):
     username : str
         Le nom de l'utilisateur
     """
+
     id: int
     username: str

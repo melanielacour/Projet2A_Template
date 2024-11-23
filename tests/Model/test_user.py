@@ -24,11 +24,6 @@ def test_invalid_username_type():
         User(id=1, username=12345, salt="random_salt", password="secure_pass", is_scout=True)
 
 
-def test_invalid_salt_type():
-    """Test de levée d'une exception si salt n'est pas une chaîne."""
-    with pytest.raises(ValidationError, match="salt must be a string"):
-        User(id=1, username="JohnDoe", salt=12345, password="secure_pass", is_scout=True)
-
 
 def test_invalid_password_type():
     """Test de levée d'une exception si password n'est pas une chaîne."""

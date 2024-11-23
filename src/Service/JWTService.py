@@ -2,15 +2,15 @@ import os
 import time
 
 import jwt
-from jwt.exceptions import ExpiredSignatureError  # Correction ici
-from jwt.exceptions import InvalidTokenError
+from jwt.exceptions import ExpiredSignatureError
 
 from src.Model.JWTResponse import JWTResponse
 
 
 class JwtService:
     """
-    Cette méthode gère la création, la déchiffrement et la validation de jetons JWT pour authentifier les utilisateurs de manière sécurisée.
+    Cette méthode gère la création, la déchiffrement et la validation
+    de jetons JWT pour authentifier les utilisateurs de manière sécurisée.
     """
 
     def __init__(self, secret: str = "", algorithm: str = "HS256"):
@@ -22,13 +22,14 @@ class JwtService:
 
     def encode_jwt(self, user_id: int) -> JWTResponse:
         """
-        Cette méthode génère un nouveau JWT incluant son identifiant (user_id) et une date d'expiration fixée à 10 minutes.
+        Cette méthode génère un nouveau JWT incluant son identifiant (user_id)
+        et une date d'expiration fixée à 10 minutes.
 
         Paramètres:
         -----------
         user_id : int
             Identifiant de l'utilisateur
-        
+
         Retourne:
         ---------
         JWTResponse
@@ -47,7 +48,7 @@ class JwtService:
         -----------
         token : str
             Le JWT à décoder
-        
+
         Retourne:
         ---------
         dict
@@ -57,14 +58,15 @@ class JwtService:
 
     def validate_user_jwt(self, token: str) -> str:
         """
-        Cette méthode renvoie l'identifiant de l'utilisateur authentifié par le JWT
+        Cette méthode renvoie l'identifiant de l'utilisateur authentifié
+        par le JWT
         Lance en cas de JWT invalide ou expiré
 
          Paramètres:
         -----------
         token : str
             Le JWT à décoder
-        
+
         Retourne:
         ---------
         str

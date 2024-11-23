@@ -24,6 +24,7 @@ class FollowerDao:
         suivent un éclaireur
     get_watchlist_of_scouts : récupère la watchlist d'un éclaireur
     """
+
     def __init__(self, db_connection: DBConnection):
         self.db_connection = db_connection
 
@@ -38,15 +39,20 @@ class FollowerDao:
         id_scout : int
             L'identifiant de l'éclaireur
         """
+        user = UserRepo(DBConnection()).get_by_id(id_scout)
+        if not user.is_scout:
+            raise ValueError(f"{id_scout} n'est pas un éclaireur !")
+        liste = self.get_followers_of_scout(id_scout)
+        if id_follower in liste:
+            raise ValueError("Vous suivez déjà cet éclaireur")
         with self.db_connection.connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
                     INSERT INTO projet_2a.followers (id_follower, id_scout)
-                    VALUES (%(id_follower)s, %(id_scout)s)
-                    ON CONFLICT (id_follower, id_scout) DO NOTHING;
+                    VALUES (%(id_follower)s, %(id_scout)s);
                     """,
-                    {"id_follower": id_follower, "id_scout": id_scout}
+                    {"id_follower": id_follower, "id_scout": id_scout},
                 )
                 return True
 
@@ -68,7 +74,7 @@ class FollowerDao:
                     DELETE FROM projet_2a.followers
                     WHERE id_follower = %(id_follower)s AND id_scout = %(id_scout)s;
                     """,
-                    {"id_follower": id_follower, "id_scout": id_scout}
+                    {"id_follower": id_follower, "id_scout": id_scout},
                 )
                 return True
 
@@ -94,7 +100,7 @@ class FollowerDao:
                     JOIN projet_2a.scouts ON scouts.id_user = followers.id_scout
                     WHERE followers.id_follower = %(id_follower)s;
                     """,
-                    {"id_follower": id_follower}
+                    {"id_follower": id_follower},
                 )
                 rows = cursor.fetchall()
 
@@ -124,7 +130,7 @@ class FollowerDao:
                     SELECT id_follower FROM projet_2a.followers
                     WHERE id_scout = %(id_scout)s;
                     """,
-                    {"id_scout": id_scout}
+                    {"id_scout": id_scout},
                 )
                 rows = cursor.fetchall()
 
@@ -167,9 +173,8 @@ class FollowerDao:
                     AND user_movies.status = 'to_watch'
                     AND followers.id_scout = %(id_scout)s;
                     """,
-                    {"id_follower": id_follower, "id_scout": id_scout}
+                    {"id_follower": id_follower, "id_scout": id_scout},
                 )
                 rows = cursor.fetchall()
 
-        # Retourner la liste des films à regarder (watchlist) sous forme de dictionnaires
         return [{"id": row["id"], "title": row["title"]} for row in rows]

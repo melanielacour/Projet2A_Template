@@ -1,5 +1,3 @@
-from dotenv import load_dotenv
-
 from src.dao.db_connection import DBConnection
 from src.Model.user_movie import UserMovie
 
@@ -28,7 +26,8 @@ class UserMovieDao:
         status : str
             Le statut de la relation entre l'utilisateur et le film.
 
-        - Si une relation existe déjà entre l'utilisateur et le film, le statut est mis à jour.
+        - Si une relation existe déjà entre l'utilisateur et le film,
+        le statut est mis à jour.
         - Sinon, une nouvelle relation est insérée dans la base de données.
         """
         # Vérifie d'abord si une ligne correspondante existe
@@ -36,17 +35,14 @@ class UserMovieDao:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT 1 FROM projet_2a.user_movies
+                    SELECT * FROM projet_2a.user_movies
                     WHERE id_user = %(id_user)s AND id_film = %(id_film)s;
                     """,
-                    {
-                        "id_user": id_user,
-                        "id_film": id_film
-                    }
+                    {"id_user": id_user, "id_film": id_film},
                 )
                 existing_row = cursor.fetchone()
 
-                if existing_row: # si la ligne existe déjà, on met à jour le status
+                if existing_row:
                     cursor.execute(
                         """
                         UPDATE projet_2a.user_movies
@@ -56,8 +52,7 @@ class UserMovieDao:
                         {
                             "id_user": id_user,
                             "id_film": id_film,
-                            "status": status
-                        }
+                            "status": status},
                     )
                 else:  # si la ligne n'existe pas, on insère une nouvelle ligne
                     cursor.execute(
@@ -69,9 +64,8 @@ class UserMovieDao:
                             "id_user": id_user,
                             "id_film": id_film,
                             "status": status
-                        }
+                            },
                     )
-
 
     def get_movies_by_user(self, id_user, status=None):
         """
@@ -88,11 +82,13 @@ class UserMovieDao:
         Returns:
         ---------
         list[UserMovie]
-            Une liste d'objets UserMovie représentant les films de l'utilisateur avec le statut donné.
+            Une liste d'objets UserMovie représentant les films de
+            l'utilisateur avec le statut donné.
         """
         with self.db_connection.connection() as conn:
             with conn.cursor() as cursor:
-                query = "SELECT id_user, id_film, status FROM projet_2a.user_movies WHERE id_user = %(id_user)s"
+                query = "SELECT id_user, id_film, status  FROM"
+                query += " projet_2a.user_movies WHERE id_user = %(id_user)s"
                 params = {"id_user": id_user}
 
                 if status:
@@ -102,11 +98,18 @@ class UserMovieDao:
                 cursor.execute(query, params)
                 rows = cursor.fetchall()
 
-        return [UserMovie(row["id_user"], row["id_film"], row["status"]) for row in rows]
+        return [
+            UserMovie(
+                row["id_user"],
+                row["id_film"],
+                row["status"]
+                ) for row in rows
+        ]
 
     def delete_movie(self, id_user, id_film, status):
         """
-        Supprime la relation entre un utilisateur et un film avec un statut spécifique.
+        Supprime la relation entre un utilisateur et
+        un film avec un statut spécifique.
 
         Parameters:
         -----------
@@ -129,6 +132,6 @@ class UserMovieDao:
                     DELETE FROM projet_2a.user_movies
                     WHERE id_user = %(id_user)s AND id_film = %(id_film)s AND status = %(status)s;
                     """,
-                    {"id_user": id_user, "id_film": id_film, "status": status}
+                    {"id_user": id_user, "id_film": id_film, "status": status},
                 )
                 return True

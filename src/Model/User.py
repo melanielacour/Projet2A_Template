@@ -1,5 +1,6 @@
 class ValidationError(Exception):
     """Cette classe lève une exception pour les erreurs de validation."""
+
     pass
 
 
@@ -7,16 +8,18 @@ class User:
     """
     Cette classe représente un utilisateur avec ses attributs (identifiant,
     pseudo, mot de passe, statut d'éclaireur ou non). Elle est utilisée
-    pour gérer les utilisateurs dans l'application. """
+    pour gérer les utilisateurs dans l'application."""
 
-    def __init__(self, id: int, username: str, salt: str, password: str, is_scout: bool):
-
+    def __init__(
+        self, id: int, username: str, salt: str, password: str, is_scout: bool
+    ):
         """
-        Cette méthode permet de mettre à jour le statut d'éclaireur (is_scout) d'un utilisateur dans la base de données.
+        Cette méthode permet de mettre à jour le statut d'éclaireur (is_scout)
+        d'un utilisateur dans la base de données.
 
         Parameters :
         -----------
-        id : int 
+        id : int
             L'identifiant unique de l'utilisateur.
         username : str
             Le pseudo de l'utilisateur.
@@ -25,7 +28,8 @@ class User:
         password : str
             e mot de passe de l'utilisateur.
         is_scout : bool
-            Le statut de l'utilisateur, qui indique s'il est un éclaireur ou non.
+            Le statut de l'utilisateur, qui indique s'il est un éclaireur
+            ou non.
         """
 
         # Vérification des types des attributs
@@ -44,22 +48,23 @@ class User:
         self.password = password
         self.is_scout = is_scout
 
-
     def __repr__(self):
         """
-        Cette méthode retourne une chaîne de caractères représentant l'objet User
+        Cette méthode retourne une chaîne de caractères représentant
+        l'objet User
         """
-
-        return f"<User(id={self.id}, username='{self.username}', is_scout={self.is_scout})>"
-
+        res = f"<User(id={self.id}, username='{self.username}', "
+        res += f"is_scout={self.is_scout})>"
+        return res
 
     def __eq__(self, other):
         """
-        Cette méthode permet de savoir si deux objets User représentent le même utilisateur en se basant uniquement sur leur identifiant.
-        
+        Cette méthode permet de savoir si deux objets User représentent le
+        même utilisateur en se basant uniquement sur leur identifiant.
+
         Parameters :
         -----------
-        other : 
+        other :
             Un autre objet à comparer avec l'objet actuel.
         """
 

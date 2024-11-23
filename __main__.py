@@ -1,4 +1,3 @@
-#from src.Interface.API import run_app
 from src.app.API import run_app
 from src.Service.MovieService import MovieService
 
