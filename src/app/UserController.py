@@ -2,16 +2,16 @@ from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
+from pydantic import BaseModel, SecretStr
+
+from src.app.dependencies import get_current_user
+from src.app.init_app import jwt_service, user_repo, user_service
+from src.app.JWTBearer import JWTBearer
 from src.dao.db_connection import DBConnection
 from src.Model.APIUser import APIUser
 from src.Model.JWTResponse import JWTResponse
-from src.Service.PasswordService import PasswordService
-from src.app.init_app import jwt_service, user_repo, user_service
-from src.app.JWTBearer import JWTBearer
-from pydantic import BaseModel
-from src.app.dependencies import get_current_user
 from src.Model.User import User
-
+from src.Service.PasswordService import PasswordService
 
 # Instanciation des services
 db_connection = DBConnection()
@@ -25,10 +25,10 @@ user_router = APIRouter(prefix="/users", tags=["Users"])
 # Modèle Pydantic pour l'enregistrement des utilisateurs
 class UserRegistration(BaseModel):
     pseudo: str
-    password: str
+    password: SecretStr
 
 @user_router.post("/register")
-def register_user(pseudo: str, password: str):
+def register_user(pseudo: str, password: SecretStr):
     try:
         message = user_service.register_user(pseudo, password)
         return {"message": message}
@@ -36,11 +36,12 @@ def register_user(pseudo: str, password: str):
         raise HTTPException(status_code=400, detail=str(e))
 
 @user_router.post("/login")
-def log_in(pseudo: str, password: str):
+
+def log_in(pseudo: str, password: SecretStr):
     try:
-        message = user_service.log_in(pseudo, password)
+        message = user_service.log_in(pseudo, password.get_secret_value())
         return {"message": message}
-    
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
@@ -51,8 +52,8 @@ class UpdatePseudoRequest(BaseModel):
     new_pseudo: str
 
 class UpdatePasswordRequest(BaseModel):
-    current_password: str
-    new_password: str
+    current_password: SecretStr
+    new_password: SecretStr
 
 @user_router.put("/user/update-pseudo")
 async def update_pseudo(request: UpdatePseudoRequest, user_id: int = Depends(get_current_user)):
@@ -109,4 +110,3 @@ async def view_profil(user_id: int= Depends(get_current_user)):
 @user_router.delete("/user/delete_user")
 async def delete_user(user_id:int= Depends(get_current_user)):
     return user_service.delete_profil(user_id)
-
