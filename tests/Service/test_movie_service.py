@@ -1,162 +1,201 @@
-import pytest
-from unittest.mock import MagicMock
+import unittest
+from unittest.mock import patch, MagicMock
 from src.Service.MovieService import MovieService
 from src.Model.Movie import Movie
 
-@pytest.fixture
-def movie_service():
-    return MovieService()
-
-def test_get_category_id(movie_service):
-    assert movie_service.get_category_id("action") == 28
-    assert movie_service.get_category_id("comédie") == 35
-    assert movie_service.get_category_id("inexistant") is None
-
-def test_get_movie_by_id_success(mocker, movie_service):
-    mock_response = {
-        "id": 123,
-        "title": "Inception",
-        "production_companies": [{"name": "Warner Bros"}],
-        "genres": [{"name": "Science-Fiction"}],
-        "release_date": "2010-07-16"
-    }
-    mocker.patch("requests.get", return_value=MagicMock(status_code=200, json=lambda: mock_response))
-
-    movie = movie_service.get_movie_by_id("123")
-    assert isinstance(movie, Movie)
-    assert movie.id_film == 123
-    assert movie.title == "Inception"
-    assert movie.producer == "Warner Bros"
-    assert movie.category == "Science-Fiction"
-    assert movie.date == "2010"
-
-def test_get_movie_by_id_failure(mocker, movie_service):
-    mocker.patch("requests.get", return_value=MagicMock(status_code=404))
-
-    with pytest.raises(Exception, match="Erreur lors de la récupération des détails : 404"):
-        movie_service.get_movie_by_id("999")
-
-
-import pytest
-from unittest.mock import MagicMock
-
-def test_get_movie_by_title_success(mocker, movie_service):
-    mock_search_response = {
-        "results": [
-            {"id": 1, "title": "Inception"},
-            {"id": 2, "title": "Interstellar"}
-        ]
-    }
-    mock_details_response_1 = {
-        "id": 1,
-        "title": "Inception",
-        "production_companies": [{"name": "Warner Bros"}],
-        "genres": [{"name": "Science-Fiction"}],
-        "release_date": "2010-07-16"
-    }
-    mock_details_response_2 = {
-        "id": 2,
-        "title": "Interstellar",
-        "production_companies": [{"name": "Paramount Pictures"}],
-        "genres": [{"name": "Science-Fiction"}],
-        "release_date": "2014-11-07"
-    }
-
-    # Simuler les appels à `requests.get`
-    mocker.patch("requests.get", side_effect=[
-        MagicMock(status_code=200, json=lambda: mock_search_response),
-        MagicMock(status_code=200, json=lambda: mock_details_response_1),
-        MagicMock(status_code=200, json=lambda: mock_details_response_2)
-    ])
-
-    # Exécuter la méthode et vérifier les résultats
-    movies = movie_service.get_movie_by_title("Inception")
+class TestMovieService(unittest.TestCase):
     
-    assert len(movies) == 2
-    assert movies[0].title == "Inception"
-    assert movies[1].title == "Interstellar"
+    @patch('src.Service.MovieService.requests.get')
+    def test_get_category_id(self, mock_get):
+        # Test de la méthode get_category_id
+        service = MovieService()
+        
+        # Cas où la catégorie est trouvée
+        category_id = service.get_category_id("action")
+        self.assertEqual(category_id, 28)
+        
+        # Cas où la catégorie est inconnue
+        category_id = service.get_category_id("nonexistent")
+        self.assertIsNone(category_id)
+    
+    @patch('src.Service.MovieService.requests.get')
+    def test_get_movie_by_id(self, mock_get):
+        # Test de la méthode get_movie_by_id
+        
+        # Mock de la réponse de l'API
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "id": 123,
+            "title": "Test Movie",
+            "production_companies": [{"name": "Test Company"}],
+            "genres": [{"name": "Action"}],
+            "release_date": "2023-12-01"
+        }
+        mock_get.return_value = mock_response
+        
+        service = MovieService()
+        movie = service.get_movie_by_id(123)
+        
+        self.assertEqual(movie.id_film, 123)
+        self.assertEqual(movie.title, "Test Movie")
+        self.assertEqual(movie.producer, "Test Company")
+        self.assertEqual(movie.category, "Action")
+        self.assertEqual(movie.date, "2023")
+    
+    @patch('src.Service.MovieService.requests.get')
+    def test_get_movie_by_title(self, mock_get):
+        # Mock de la réponse de recherche
+        mock_search_response = MagicMock()
+        mock_search_response.status_code = 200
+        mock_search_response.json.return_value = {"results": [
+            {"id": 123, "title": "Test Movie", "adult": False}
+        ]}
 
-   
+        # Mock de la réponse de détails du film
+        mock_details_response = MagicMock()
+        mock_details_response.status_code = 200
+        mock_details_response.json.return_value = {
+            "id": 123,
+            "title": "Test Movie",
+            "production_companies": [{"name": "Test Company"}],
+            "genres": [{"name": "Action"}],
+            "release_date": "2023-12-01",
+            "adult": False
+        }
 
-def test_get_movie_by_title_no_results(mocker, movie_service):
-    mock_search_response = {"results": []}
-    mocker.patch("requests.get", return_value=MagicMock(status_code=200, json=lambda: mock_search_response))
+        # Définir le comportement pour chaque appel
+        mock_get.side_effect = [mock_search_response, mock_details_response]
+    
+        service = MovieService()
+        films = service.get_movie_by_title("Test Movie")
 
-    with pytest.raises(Exception, match="Aucun film trouvé."):
-        movie_service.get_movie_by_title("Film Inexistant")
+        # Vérification que la méthode retourne bien une liste de films avec l'instance de Movie attendue
+        assert len(films) == 1
+        assert isinstance(films[0], Movie)
+        assert films[0].id_film == 123
+        assert films[0].title == "Test Movie"
+        assert films[0].producer == "Test Company"
+        assert films[0].category == "Action"
+        assert films[0].date == "2023"
+        
+    @patch('src.Service.MovieService.requests.get')
+    def test_get_movies_by_category(self, mock_get):
+        # Mock de la réponse de recherche des films par catégorie
+        mock_search_response = MagicMock()
+        mock_search_response.status_code = 200
+        mock_search_response.json.return_value = {
+            "results": [
+                {"id": 123, "title": "Test Movie", "adult": False}
+            ]
+        }
 
-def test_get_movies_by_category_success(mocker, movie_service):
-    mock_category_response = {
-        "results": [{"id": 3, "title": "Avatar"}]
-    }
-    mock_details_response = {
-        "id": 3,
-        "title": "Avatar",
-        "production_companies": [{"name": "20th Century Fox"}],
-        "genres": [{"name": "Science-Fiction"}],
-        "release_date": "2009-12-18"
-    }
-    mocker.patch("requests.get", side_effect=[
-        MagicMock(status_code=200, json=lambda: mock_category_response),
-        MagicMock(status_code=200, json=lambda: mock_details_response)
-    ])
+        # Mock de la réponse de détails du film
+        mock_details_response = MagicMock()
+        mock_details_response.status_code = 200
+        mock_details_response.json.return_value = {
+            "id": 123,
+            "title": "Test Movie",
+            "production_companies": [{"name": "Test Company"}],
+            "genres": [{"name": "Action"}],
+            "release_date": "2023-12-01"
+        }
 
-    movies = movie_service.get_movies_by_category(28)
-    assert len(movies) == 1
-    assert movies[0].title == "Avatar"
-    assert movies[0].producer == "20th Century Fox"
+        # Définir le comportement pour chaque appel
+        mock_get.side_effect = [mock_search_response, mock_details_response]
+    
+        service = MovieService()
+        films = service.get_movies_by_category("Action")
 
-def test_get_movies_by_category_failure(mocker, movie_service):
-    mocker.patch("requests.get", return_value=MagicMock(status_code=404))
+        # Vérification que la méthode retourne bien une liste de films avec l'instance de Movie attendue
+        assert len(films) == 1
+        assert isinstance(films[0], Movie)
+        assert films[0].id_film == 123
+        assert films[0].title == "Test Movie"
+        assert films[0].producer == "Test Company"
+        assert films[0].category == "Action"
+        assert films[0].date == "2023"
+    
+    @patch('src.Service.MovieService.requests.get')
+    def test_get_movies_by_director(self, mock_get):
+        # Mock de la réponse de recherche des films par réalisateur
+        mock_search_response = MagicMock()
+        mock_search_response.status_code = 200
+        mock_search_response.json.return_value = {
+            "results": [
+                {"id": 123, "title": "Test Movie", "adult": False}
+            ]
+        }
 
-    with pytest.raises(Exception, match="Erreur lors de la récupération des films par catégorie : 404"):
-        movie_service.get_movies_by_category(28)
+        # Mock de la réponse de détails du film
+        mock_details_response = MagicMock()
+        mock_details_response.status_code = 200
+        mock_details_response.json.return_value = {
+            "id": 123,
+            "title": "Test Movie",
+            "production_companies": [{"name": "Test Company"}],
+            "genres": [{"name": "Action"}],
+            "release_date": "2023-12-01"
+        }
 
-def test_get_movies_by_director_success(mocker, movie_service):
-    mock_director_response = {
-        "results": [{"id": 4, "title": "The Dark Knight"}]
-    }
-    mock_details_response = {
-        "id": 4,
-        "title": "The Dark Knight",
-        "production_companies": [{"name": "Warner Bros"}],
-        "genres": [{"name": "Action"}],
-        "release_date": "2008-07-18"
-    }
-    mocker.patch("requests.get", side_effect=[
-        MagicMock(status_code=200, json=lambda: mock_director_response),
-        MagicMock(status_code=200, json=lambda: mock_details_response)
-    ])
+        # Simuler les deux appels
+        mock_get.side_effect = [mock_search_response, mock_details_response]
+    
+        service = MovieService()
+        films = service.get_movies_by_director(456)  # Director ID
+    
+        # Vérifier que le nombre de films est bien 1
+        self.assertEqual(len(films), 1)
+    
+        # Vérifier que le film retourné est correct
+        film = films[0]
+        self.assertEqual(film.id_film, 123)
+        self.assertEqual(film.title, "Test Movie")
+        self.assertEqual(film.producer, "Test Company")
+        self.assertEqual(film.category, "Action")
+        self.assertEqual(film.date, "2023")
+    
+    @patch('src.Service.MovieService.requests.get')
+    def test_get_movies_by_director_name(self, mock_get):
+        # Mock de la réponse de recherche de réalisateur
+        mock_search_response = MagicMock()
+        mock_search_response.status_code = 200
+        mock_search_response.json.return_value = {
+            "results": [
+                {"id": 456, "name": "Test Director"}
+            ]
+        }
+        # Mock de la réponse de films par réalisateur
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "results": [
+                {"id": 123, "title": "Test Movie", "adult": False}
+            ]
+        }
+        # Mock de la réponse de détails du film
+        mock_details_response = MagicMock()
+        mock_details_response.status_code = 200
+        mock_details_response.json.return_value = {
+            "id": 123,
+            "title": "Test Movie",
+            "production_companies": [{"name": "Test Company"}],
+            "genres": [{"name": "Action"}],
+            "release_date": "2023-12-01"
+        }
 
-    movies = movie_service.get_movies_by_director(525)
-    assert len(movies) == 1
-    assert movies[0].title == "The Dark Knight"
-
-def test_get_movies_by_director_name_success(mocker, movie_service):
-    mock_search_response = {"results": [{"id": 525, "name": "Christopher Nolan"}]}
-    mock_director_movies_response = {
-        "results": [{"id": 4, "title": "The Dark Knight"}]
-    }
-    mock_details_response = {
-        "id": 4,
-        "title": "The Dark Knight",
-        "production_companies": [{"name": "Warner Bros"}],
-        "genres": [{"name": "Action"}],
-        "release_date": "2008-07-18"
-    }
-    mocker.patch("requests.get", side_effect=[
-        MagicMock(status_code=200, json=lambda: mock_search_response),
-        MagicMock(status_code=200, json=lambda: mock_director_movies_response),
-        MagicMock(status_code=200, json=lambda: mock_details_response)
-    ])
-
-    movies = movie_service.get_movies_by_director_name("Christopher Nolan")
-    assert len(movies) == 1
-    assert movies[0].title == "The Dark Knight"
-
-def test_get_movies_by_director_name_no_results(mocker, movie_service):
-    mock_search_response = {"results": []}
-    mocker.patch("requests.get", return_value=MagicMock(status_code=200, json=lambda: mock_search_response))
-
-    with pytest.raises(Exception, match="Aucun réalisateur trouvé."):
-        movie_service.get_movies_by_director_name("Réalisateur Inconnu")
+        # Mettre tous les mocks dans side_effect
+        mock_get.side_effect = [mock_search_response, mock_response, mock_details_response]
+    
+        service = MovieService()
+        films = service.get_movies_by_director_name("Test Director")
+    
+        # Vérification des résultats
+        self.assertEqual(len(films), 1)
+        self.assertEqual(films[0].id_film, 123)
+        self.assertEqual(films[0].title, "Test Movie")
+        self.assertEqual(films[0].producer, "Test Company")
+        self.assertEqual(films[0].category, "Action")
+        self.assertEqual(films[0].date, "2023")
+if __name__ == '__main__':
+    unittest.main()

@@ -10,8 +10,10 @@ from src.Model.User import User
 
 class PasswordService:
     """
-    Cette classe fournit les méthodes pour hacher les mots de passe, générer des sels,
-    vérifier la force des mots de passe et valider les utilisateurs par rapport à leur
+    Cette classe fournit les méthodes pour hacher
+    les mots de passe, générer des sels,
+    vérifier la force des mots de passe et valider
+    les utilisateurs par rapport à leur
     pseudo et mot de passe.
 
     """
@@ -19,10 +21,11 @@ class PasswordService:
     def __init__(self):
         pass
 
-
     def hash_password(self, password: str, salt: Optional[str] = None) -> str:
         """
-        Cette méthode prend un mot de passe et un sel et génère un hachage sécurisé du mot de passe à l'aide de l'algorithme SHA-256.
+        Cette méthode prend un mot de passe et un sel et
+        génère un hachage sécurisé du mot de passe à l'aide
+        de l'algorithme SHA-256.
 
         Paramètres:
         -----------
@@ -32,25 +35,25 @@ class PasswordService:
             Le sel qu'on va utiliser pour le hachage.
 
         """
-        # Si aucun sel n'est fourni, un nouveau sel est généré.
-        # Cela garantit que même si deux utilisateurs ont le même mot de passe, leurs hachages seront différents grâce à des sels uniques.
         if salt is None:
             salt = self.create_salt()
-        hashed_password = hashlib.sha256((salt + password).encode()).hexdigest()
+        hashed_password = hashlib.sha256(
+            (salt + password).encode()
+            ).hexdigest()
         return f"{salt}${hashed_password}"
-
 
     def create_salt(self) -> str:
         """
-        Cette méthode génére un sel aléatoire,avec une chaîne hexadécimale de 128 caractères.
+        Cette méthode génére un sel aléatoire,
+        avec une chaîne hexadécimale de 128 caractères.
         """
         return secrets.token_hex(128)
 
-
-
     def check_password_strength(self, password: str):
         """
-        Cette méthode vérifie que le mot de passe respecte les critères tels que la longueur, la présence de lettres majuscules et minuscules, et de chiffres.
+        Cette méthode vérifie que le mot de passe respecte les critères tels
+        que la longueur, la présence de lettres majuscules
+        et minuscules, et de chiffres.
         Lève une exception si le mot de passe ne respecte pas les critères.
 
         Paramètres:
@@ -59,22 +62,25 @@ class PasswordService:
             Le mot de passe de l'utilisateur
 
         """
-        # on verifie que le mot de passe a une longueur inférieur à 8 caractères.
         if len(password) < 8:
             raise ValueError("Password length must be at least 8 characters")
-        # on verifie que le mot de passe ne contient que des lettres et des chiffres, minuscules et chiffres
-        if not re.match(r'^[a-zA-Z0-9]+$', password):
-            raise ValueError("Password must contain only letters and digits (no special characters)")
+        if not re.match(r"^[a-zA-Z0-9]+$", password):
+            raise ValueError(
+                "Password must contain only letters and digits" +
+                "(no special characters)"
+            )
         if not any(c.islower() for c in password):
-            raise ValueError("Password must contain at least one lowercase letter")
+            raise ValueError(
+                "Password must contain at least one lowercase letter"
+                )
         if not any(c.isupper() for c in password):
-            raise ValueError("Password must contain at least one uppercase letter")
+            raise ValueError(
+                "Password must contain at least one uppercase letter"
+                )
         if not any(c.isdigit() for c in password):
             raise ValueError("Password must contain at least one digit")
-        else :
+        else:
             return password
-
-
 
     def validate_pseudo_password(self, pseudo: str, password: str) -> User:
         user_with_pseudo = UserRepo(DBConnection()).get_by_username(pseudo)
@@ -86,7 +92,7 @@ class PasswordService:
 
         salt_stored = user_with_pseudo.password[:256]
         hashed_password_stored = user_with_pseudo.password[256:]
-        
+
         # Hachez le mot de passe fourni
         hashed_password = self.hash_password(password, salt_stored)[256:]
 
@@ -101,11 +107,13 @@ class PasswordService:
 
         return user_with_pseudo
 
+    def validate_password(
+        self, input_password: str, stored_password: str
+     ) -> bool:
 
-
-    def validate_password(self, input_password: str, stored_password: str) -> bool:
         """
-        Cette méthode valide le mot de passe en le comparant avec le mot de passe stocké
+        Cette méthode valide le mot de passe en le comparant
+        avec le mot de passe stocké
         Elle retourne True si les mots de passe correspondent, sinon False.
 
         Paramètres:

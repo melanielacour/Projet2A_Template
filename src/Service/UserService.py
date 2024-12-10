@@ -11,10 +11,13 @@ from src.Service.PasswordService import PasswordService
 
 load_dotenv()
 
+
 class UserService:
     """
-    Cette classe gère l'inscription, la connexion, la mise à jour des informations utilisateur, et la gestion des statuts d'éclaireur,
-    en assurant la validation des identifiants et la sécurité des mots de passe.
+    Cette classe gère l'inscription, la connexion, la mise à jour des
+    informations utilisateur, et la gestion des statuts d'éclaireur,
+    en assurant la validation des identifiants et la sécurité des mots de
+    passe.
     """
 
     def __init__(self):
@@ -41,7 +44,8 @@ class UserService:
         Lève:
         -----
         ValueError:
-            Si l'identifiant est déjà utilisé ou si le mot de passe ne respecte pas les règles.
+            Si l'identifiant est déjà utilisé ou si
+            le mot de passe ne respecte pas les règles.
         """
 
         # on Vérifie si l'utilisateur existe déjà
@@ -53,11 +57,11 @@ class UserService:
         # on Valide la force du mot de passe
         self.password_service.check_password_strength(password)
 
-        # Hacher le mot de passe avant de l'enregistrer
         hashed_password = self.password_service.hash_password(password)
 
-        # on va créer le nouvel utilisateur dans la base de données avec le mot de passe haché
-        user_cree = self.user_repo.insert_into_db(username=pseudo, salt= None, hashed_password=hashed_password)
+        user_cree = self.user_repo.insert_into_db(
+            username=pseudo, salt=None, hashed_password=hashed_password
+        )
 
         if user_cree:
             return "Vous êtes bien inscrit !"
@@ -66,8 +70,10 @@ class UserService:
 
     def log_in(self, pseudo: str, password: str) -> dict:
         """
-        Cette méthode permet à un utilisateur de se connecter en fournissant un pseudo et un mot de passe.
-        Elle vérifie l'existence de l'utilisateur et renvoie un booléen pour indiquer le succès ou l'échec de la connexion.
+        Cette méthode permet à un utilisateur de se connecter
+        en fournissant un pseudo et un mot de passe.
+        Elle vérifie l'existence de l'utilisateur et renvoie un booléen pour
+        indiquer le succès ou l'échec de la connexion.
 
         Paramètres:
         -----------
@@ -79,7 +85,8 @@ class UserService:
         Retourne:
         ---------
         dict
-            Un dictionnaire contenant le succès et le token JWT en cas d'authentification réussie.
+            Un dictionnaire contenant le succès et le token JWT
+            en cas d'authentification réussie.
 
         Lève:
         -----
@@ -95,7 +102,9 @@ class UserService:
             raise ValueError("Identifiant incorrect.")
 
         # on vérifie si le mot de passe correspond au pseudo
-        if not self.password_service.validate_pseudo_password(pseudo, password):
+        if not self.password_service.validate_pseudo_password(
+            pseudo, password
+        ):
             raise ValueError("Mot de passe incorrect.")
 
         jwt_response = self.jwt_service.encode_jwt(user.id)
@@ -120,17 +129,19 @@ class UserService:
         """
         existing_user = self.user_repo.get_by_id(user_id)
         if not existing_user:
-            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte.")
-        
-        # on vérifie si le nouveau pseudo est déjà pris
+            raise ValueError(
+                "L'utilisateur n'existe pas. Veuillez créer un compte."
+                )
+
         if self.user_repo.get_by_username(new_pseudo):
             raise ValueError("Ce pseudo est déjà utilisé.")
-    
+
         self.user_repo.update_pseudo(user_id, new_pseudo)
         return "Le pseudo a été mis à jour avec succès."
 
-
-    def update_password(self, user_id: int, current_password: str, new_password: str) -> str:
+    def update_password(
+        self, user_id: int, current_password: str, new_password: str
+    ) -> str:
         """
         Permet de changer le mot de passe d'un utilisateur.
 
@@ -148,12 +159,16 @@ class UserService:
         str
             Message de confirmation si le mot de passe est modifié avec succès.
         """
-        
+
         user = self.user_repo.get_by_id(user_id)
         if not user:
-            raise ValueError("L'utilisateur n'existe pas. Veuillez créer un compte.")
-        
-        if not self.password_service.validate_pseudo_password(user.username, current_password):
+            raise ValueError(
+                "L'utilisateur n'existe pas. Veuillez créer un compte."
+                )
+
+        if not self.password_service.validate_pseudo_password(
+            user.username, current_password
+        ):
             raise ValueError("Mot de passe actuel incorrect.")
 
         self.password_service.check_password_strength(new_password)
@@ -162,10 +177,10 @@ class UserService:
         self.user_repo.update_password(user_id, hashed_password)
         return "Le mot de passe a été mis à jour avec succès."
 
-
     def promote_to_scout(self, user_id: int) -> str:
         """
-        Passe le statut de l'utilisateur à éclaireur (true) si celui-ci a au moins 10 commentaires.
+        Passe le statut de l'utilisateur à éclaireur (true)
+        si celui-ci a au moins 10 commentaires.
 
         Paramètres:
         -----------
@@ -175,22 +190,28 @@ class UserService:
         Retourne:
         ---------
         str
-            Message confirmant le passage à éclaireur ou indiquant le non-respect des conditions.
+            Message confirmant le passage à éclaireur
+            ou indiquant le non-respect des conditions.
         """
         # Vérification du nombre de commentaires de l'utilisateur
-        user=self.user_repo.get_by_id(user_id)
+        user = self.user_repo.get_by_id(user_id)
         if user.is_scout:
             raise ValueError("Vous êtes déja un éclaireur")
-        user_reviews = ReviewDao(DBConnection()).get_all_reviews_by_user_id(user_id)
+        user_reviews = ReviewDao(DBConnection()).get_all_reviews_by_user_id(
+            user_id
+            )
         if len(user_reviews) >= 10:
             self.user_repo.update_status(user_id, True)
             return "Vous êtes maintenant éclaireur !"
         else:
-            return "Vous ne remplissez pas les conditions nécessaires pour devenir éclaireur."
+            res = "Vous ne remplissez pas les conditions nécessaires"
+            res += " pour devenir éclaireur."
+            return res
 
     def demote_scout(self, user_id: int) -> str:
         """
-        Révoque le statut éclaireur de l'utilisateur, passant `is_scout` à false.
+        Révoque le statut éclaireur de l'utilisateur,
+        passant `is_scout` à false.
 
         Paramètres:
         -----------
@@ -202,13 +223,15 @@ class UserService:
         str
             Message confirmant la révocation du statut éclaireur.
         """
-        user=self.user_repo.get_by_id(user_id)
+        user = self.user_repo.get_by_id(user_id)
         if not user.is_scout:
             raise ValueError("Vous n'êtes pas un éclaireur")
         self.user_repo.update_status(user_id, False)
-        liste=FollowerDao(DBConnection).get_followers_of_scout(user_id)
+        liste = FollowerDao(DBConnection).get_followers_of_scout(user_id)
         for val in liste:
-            res=FollowerDao(DBConnection).unfollow_scout(id_follower=val, id_scout=user_id)
+            FollowerDao(DBConnection).unfollow_scout(
+                id_follower=val, id_scout=user_id
+            )
         return "Votre statut éclaireur a été révoqué."
 
     def view_profil(self, user_id):
@@ -216,4 +239,3 @@ class UserService:
 
     def delete_profil(self, user_id):
         return self.user_repo.delete_by_id(user_id)
-

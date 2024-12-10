@@ -13,5 +13,5 @@ def test_initialization():
 def test_repr():
     """Test de la représentation textuelle (__repr__) de MovieSimple."""
     movie = MovieSimple(id_local=1, id_tmdb=12345, title="Inception")
-    expected_repr = "Movie(id_local=1, id_tmdb=12345, title='Inception')"
+    expected_repr = ("Movie(id_local=1, id_tmdb=12345, title='Inception')")
     assert repr(movie) == expected_repr

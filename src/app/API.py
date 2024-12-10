@@ -9,9 +9,13 @@ from src.app.scout_controller import scout_router
 from src.app.movie_local_controller import movielocal_router
 from src.app.recommendation_controller import recommendation_router
 
+
 def run_app():
-    app = FastAPI(title="Popcorn Critic", description="Trouvez vos films préférés en un clic !")
-    
+    app = FastAPI(
+        title="Popcorn Critic",
+        description="Votre compagnon cinéphile ultime : explorez, critiquez et partagez vos avis sur vos films préférés en un clin d'œil !",
+    )
+
     app.include_router(movie_router)
 
     app.include_router(movielocal_router)
