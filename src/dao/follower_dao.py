@@ -96,15 +96,14 @@ class FollowerDao:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT scouts.id_user FROM projet_2a.followers
-                    JOIN projet_2a.scouts ON scouts.id_user = followers.id_scout
+                    SELECT id_scout FROM projet_2a.followers
                     WHERE followers.id_follower = %(id_follower)s;
                     """,
                     {"id_follower": id_follower},
                 )
                 rows = cursor.fetchall()
 
-        return [row["id_user"] for row in rows]
+        return [row["id_scout"] for row in rows]
 
     def get_followers_of_scout(self, id_scout):
         """Récupère la liste des utilisateurs qui suivent un éclaireur
@@ -165,10 +164,10 @@ class FollowerDao:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT DISTINCT films.id, films.title
+                    SELECT DISTINCT film.id, film.title
                     FROM projet_2a.followers
                     JOIN projet_2a.user_movies ON user_movies.id_user = followers.id_scout
-                    JOIN projet_2a.films ON films.id = user_movies.id_film
+                    JOIN projet_2a.film ON film.id = user_movies.id_film
                     WHERE followers.id_follower = %(id_follower)s
                     AND user_movies.status = 'to_watch'
                     AND followers.id_scout = %(id_scout)s;

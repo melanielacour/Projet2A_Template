@@ -61,7 +61,7 @@ async def get_followers_of_scout(
 )
 async def get_watchlist_of_scouts(
     id_scout: int,
-    did_follower: int = Depends(get_current_user),
+    id_follower: int = Depends(get_current_user),
     db: DBConnection = Depends(),
 ):
     watchlist = follower_dao.get_watchlist_of_scouts(
