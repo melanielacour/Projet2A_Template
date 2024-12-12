@@ -176,7 +176,7 @@ def test_update_password():
 
     # Définir une réponse pour la requête d'update avec rowcount=1 (une ligne affectée)
     mock_db.set_query_response(
-        "UPDATE users SET hashed_password = %(hashed_password)s WHERE id = %(user_id)s",
+        "UPDATE users SET password = %(hashed_password)s WHERE id = %(user_id)s",
         response=True,  # Cette réponse n'est pas utilisée ici, donc True suffit
         rowcount=1  # Simule qu'une ligne a été affectée
     )

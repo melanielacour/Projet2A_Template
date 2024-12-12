@@ -164,10 +164,10 @@ class FollowerDao:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT DISTINCT films.id, films.title
+                    SELECT DISTINCT film.id, film.title
                     FROM projet_2a.followers
                     JOIN projet_2a.user_movies ON user_movies.id_user = followers.id_scout
-                    JOIN projet_2a.films ON films.id = user_movies.id_film
+                    JOIN projet_2a.film ON film.id = user_movies.id_film
                     WHERE followers.id_follower = %(id_follower)s
                     AND user_movies.status = 'to_watch'
                     AND followers.id_scout = %(id_scout)s;
