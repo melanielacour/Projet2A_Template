@@ -169,7 +169,7 @@ class FollowerDao:
                     JOIN projet_2a.user_movies ON user_movies.id_user = followers.id_scout
                     JOIN projet_2a.film ON film.id = user_movies.id_film
                     WHERE followers.id_follower = %(id_follower)s
-                    AND user_movies.status = 'to_watch'
+                    AND user_movies.status = 'to watch'
                     AND followers.id_scout = %(id_scout)s;
                     """,
                     {"id_follower": id_follower, "id_scout": id_scout},
