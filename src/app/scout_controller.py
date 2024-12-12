@@ -1,11 +1,12 @@
-from typing import TYPE_CHECKING, Annotated
-from typing import Optional
+from typing import TYPE_CHECKING, Annotated, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
-from src.dao.db_connection import DBConnection
 from pydantic import BaseModel
+
 from src.app.dependencies import get_current_user
 from src.app.init_app import follower_dao
+from src.dao.db_connection import DBConnection
 from src.dao.follower_dao import FollowerDao
 
 scout_router = APIRouter(prefix="/scout", tags=["My Scouts/followers"])
@@ -61,7 +62,7 @@ async def get_followers_of_scout(
 )
 async def get_watchlist_of_scouts(
     id_scout: int,
-    did_follower: int = Depends(get_current_user),
+    id_follower: int = Depends(get_current_user),
     db: DBConnection = Depends(),
 ):
     watchlist = follower_dao.get_watchlist_of_scouts(
